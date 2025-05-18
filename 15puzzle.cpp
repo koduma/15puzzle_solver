@@ -158,50 +158,50 @@ node cand = temp;
 int xxx=((int)zero_pos)%COL;
 int yyy=((int)zero_pos)/COL;
 if (0 <= xxx + dx[j] && xxx + dx[j] < COL &&
-	0 <= yyy + dy[j] && yyy + dy[j] < ROW) {
-	char board2[ROW][COL];
-        memcpy(board2,temp_board,sizeof(board2));
-	int ny=yyy + dy[j];
-	int nx=xxx + dx[j];
-        ll z=(ll)board2[ny][nx];
-        cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
-	cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
-        cand.ans[i/16] |= z<<((4*i)%64);
-        swap(board2[ny][nx],board2[yyy][xxx]);
-        cand.score=MH_EV(board2);
-        fff[(4 * k) + j] = cand;
-	}
-        else{
-        cand.score=125;
-        fff[(4 * k) + j] = cand;
-        }
-	}
-	}
-	dque.clear();
-	vector<pair<int,int> >vv;
-	for (int j = 0; j < 4 * ks; j++) {
-	if (fff[j].score == 0) {
-	bestans=getans(fff[j].ans);
-	return i+1;
-	}
-        vv.push_back(make_pair(fff[j].score,j));
-        }
-        sort(vv.begin(),vv.end());
-	int push_node=0;
-	for (int j = 0; push_node < BW ;j++) {
-	if(j>=(int)vv.size()){break;}
-        int p=vv[j].second;
-        node n1=fff[p];
-	if (i < TRN - 1) {
-	if(!visited[n1.hash]){
-	visited[n1.hash]=true;
-	dque.push_back(n1);
-	push_node++;
-	}
-	}
-	}
-	}
-	return -1;
+0 <= yyy + dy[j] && yyy + dy[j] < ROW) {
+char board2[ROW][COL];
+memcpy(board2,temp_board,sizeof(board2));
+int ny=yyy + dy[j];
+int nx=xxx + dx[j];
+ll z=(ll)board2[ny][nx];
+cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
+cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
+cand.ans[i/16] |= z<<((4*i)%64);
+swap(board2[ny][nx],board2[yyy][xxx]);
+cand.score=MH_EV(board2);
+fff[(4 * k) + j] = cand;
+}
+else{
+cand.score=125;
+fff[(4 * k) + j] = cand;
+}
+}
+}
+dque.clear();
+vector<pair<int,int> >vv;
+for (int j = 0; j < 4 * ks; j++) {
+if (fff[j].score == 0) {
+bestans=getans(fff[j].ans);
+return i+1;
+}
+vv.push_back(make_pair(fff[j].score,j));
+}
+sort(vv.begin(),vv.end());
+int push_node=0;
+for (int j = 0; push_node < BW ;j++) {
+if(j>=(int)vv.size()){break;}
+int p=vv[j].second;
+node n1=fff[p];
+if (i < TRN - 1) {
+if(!visited[n1.hash]){
+visited[n1.hash]=true;
+dque.push_back(n1);
+push_node++;
+}
+}
+}
+}
+return -1;
 }
 
 int BEAM_SEARCH2(char board[ROW][COL]) {
@@ -228,51 +228,51 @@ node cand = temp;
 int xxx=((int)zero_pos)%COL;
 int yyy=((int)zero_pos)/COL;
 if (0 <= xxx + dx[j] && xxx + dx[j] < COL &&
-	0 <= yyy + dy[j] && yyy + dy[j] < ROW) {
-	char board2[ROW][COL];
-        memcpy(board2,temp_board,sizeof(board2));
-	int ny=yyy + dy[j];
-	int nx=xxx + dx[j];
-        ll z=(ll)board2[ny][nx];
-        cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
-	cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
-        cand.ans[i/16] |= z<<((4*i)%64);
-        swap(board2[ny][nx],board2[yyy][xxx]);
-        cand.score=(char)BEAM_SEARCH(board2);
-        if(cand.score==-1){cand.score=125;}
-        if(cand.score<10){
-        if(MH_EV(board2)==0){
-        bestans=getans(cand.ans);
-        return i+1;
-        }    
-        }
-        ggg[(4 * k) + j] = cand;
-	}
-        else{
-        cand.score=125;
-        ggg[(4 * k) + j] = cand;
-	}
-	}
-	}
-	dque.clear();
-	vector<pair<int,int> >vv;
-	for (int j = 0; j < 4 * ks; j++) {
-            vv.push_back(make_pair(ggg[j].score,j));
-        }
-        sort(vv.begin(),vv.end());
-	int push_node=0;
-	for (int j = 0; push_node < BW2 ;j++) {
-		if(j>=(int)vv.size()){break;}
-		int p=vv[j].second;
-		node n1=ggg[p];
-		if (i < TRN - 1) {
-		if(!visited[n1.hash]){
-		visited[n1.hash]=true;
-		dque.push_back(n1);
-		push_node++;
-		}
-		}
-	}
+0 <= yyy + dy[j] && yyy + dy[j] < ROW) {
+char board2[ROW][COL];
+memcpy(board2,temp_board,sizeof(board2));
+int ny=yyy + dy[j];
+int nx=xxx + dx[j];
+ll z=(ll)board2[ny][nx];
+cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
+cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
+cand.ans[i/16] |= z<<((4*i)%64);
+swap(board2[ny][nx],board2[yyy][xxx]);
+cand.score=(char)BEAM_SEARCH(board2);
+if(cand.score==-1){cand.score=125;}
+if(cand.score<10){
+if(MH_EV(board2)==0){
+bestans=getans(cand.ans);
+return i+1;
+}    
+}
+ggg[(4 * k) + j] = cand;
+}
+else{
+cand.score=125;
+ggg[(4 * k) + j] = cand;
+}
+}
+}
+dque.clear();
+vector<pair<int,int> >vv;
+for (int j = 0; j < 4 * ks; j++) {
+vv.push_back(make_pair(ggg[j].score,j));
+}
+sort(vv.begin(),vv.end());
+int push_node=0;
+for (int j = 0; push_node < BW2 ;j++) {
+if(j>=(int)vv.size()){break;}
+int p=vv[j].second;
+node n1=ggg[p];
+if (i < TRN - 1) {
+if(!visited[n1.hash]){
+visited[n1.hash]=true;
+dque.push_back(n1);
+push_node++;
+}
+}
+}
 }
 return -1;
 }
