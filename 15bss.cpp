@@ -1,4 +1,4 @@
-//g++ -O2 -std=c++11 -fopenmp 15bss.cpp -o 15bss
+﻿//g++ -O2 -std=c++11 -fopenmp -lpthread 15bss.cpp loguru.cpp -o 15bss -mcmodel=large
 
 /*
     
@@ -39,6 +39,8 @@ path=66
 #include <fstream>
 #include <functional>
 #include <unordered_map>
+#include "hash_map.hpp"
+#include <immintrin.h>
 #include <omp.h>
 
 #pragma GCC target ("sse4.2")
@@ -48,8 +50,8 @@ using namespace std;
 #define ROW 4
 #define COL 4
 #define TRN 126
-#define BW 30000
-#define BW2 10
+#define BW 150000
+#define BW2 100
 
 typedef unsigned long long ll;
 
@@ -61,6 +63,8 @@ char prev;
 }fff[4*BW],ggg[4*BW2];
 
 string bestans;
+
+int shot=0;
 
 ll zoblish_field[ROW][COL][ROW*COL];
 
@@ -185,7 +189,9 @@ return ans;
 }
 
 int BEAM_SEARCH(char board[ROW][COL]) {
-if(MH_EV(board)==0){return 0;}    
+if(MH_EV(board)==0){return 0;}
+if(shot%1000==0){printf("shot=%d\n",shot);}
+shot++;    
 vector<node>dque;
 node n0;
 n0.hash=calc_hash(board);
@@ -198,7 +204,7 @@ dque.push_back(n0);
 int dx[4] = { -1, 0,0,1 };
 int dy[4] = { 0,-1,1,0 };
 
-unordered_map<ll, bool> visited;
+emilib::HashMap<ll, bool> visited;
 
 for (int i = 0; i < TRN; i++) {
 int ks = (int)dque.size();
@@ -269,7 +275,7 @@ n0.prev=-1;
 dque.push_back(n0);
 int dx[4] = { -1, 0,0,1 };
 int dy[4] = { 0,-1,1,0 };
-unordered_map<ll, bool> visited;
+emilib::HashMap<ll, bool> visited;
 for (int i = 0; i < TRN; i++) {
 int ks = (int)dque.size();
 //#pragma omp parallel for
