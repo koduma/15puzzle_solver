@@ -1,4 +1,4 @@
-﻿//g++ -O2 -std=c++11 -fopenmp -lpthread 15bss.cpp loguru.cpp -o 15bss -mcmodel=large
+//g++ -O2 -std=c++11 -fopenmp -lpthread 15bss.cpp loguru.cpp -o 15bss -mcmodel=large
 
 /*
     
@@ -51,7 +51,7 @@ using namespace std;
 #define COL 4
 #define TRN 126
 #define BW 150000
-#define BW2 1
+#define BW2 300//BW2=1(145s)
 
 typedef unsigned long long ll;
 
@@ -191,6 +191,7 @@ return ans;
 int BEAM_SEARCH(char board[ROW][COL]) {
 if(MH_EV(board)==0){return 0;}
 if(shot%1000==0){printf("shot=%d\n",shot);}
+//printf("shot=%d\n",shot);
 shot++;    
 vector<node>dque;
 node n0;
@@ -363,12 +364,21 @@ zoblish_field[i1][i2][i3]=xor128();
 }
 }
 }
+
+auto start = chrono::high_resolution_clock::now();
     
 
 printf("path=%d\n",BEAM_SEARCH2(board));
+
+
+auto end = chrono::high_resolution_clock::now();
 //printf("path=%d\n",BEAM_SEARCH(board));
 //BEAM_SEARCH2(board);
 cout<<bestans;
+
+auto duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+
+cout << "time: " << duration/1000.0 << "s" << endl;
 
 return 0;
 }
