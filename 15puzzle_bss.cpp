@@ -1,8 +1,19 @@
-//g++ -O2 -std=c++11 -fopenmp 15puzzle.cpp -o 15p
+//g++ -O2 -std=c++11 -fopenmp 15bss.cpp -o 15bss
 
-//#pragma warning(disable:4710)
-//#pragma warning(disable:4711)
-//#pragma warning(disable:4820)
+/*
+    
+14 15 8 12
+10 11 9 13
+2 6 5 1
+3 7 4 *
+
+path=66
+
+*/
+
+#pragma warning(disable:4710)
+#pragma warning(disable:4711)
+#pragma warning(disable:4820)
 #pragma GCC optimize("unroll-loops")
 #include <vector>
 #include <cfloat>
@@ -28,7 +39,7 @@
 #include <fstream>
 #include <functional>
 #include <unordered_map>
-//#include <omp.h>
+#include <omp.h>
 
 #pragma GCC target ("sse4.2")
 
@@ -36,9 +47,9 @@ using namespace std;
 
 #define ROW 4
 #define COL 4
-#define TRN 100
-#define BW 1000
-#define BW2 2
+#define TRN 126
+#define BW 30000
+#define BW2 10
 
 typedef unsigned long long ll;
 
@@ -191,7 +202,7 @@ unordered_map<ll, bool> visited;
 
 for (int i = 0; i < TRN; i++) {
 int ks = (int)dque.size();
-//#pragma omp parallel for
+#pragma omp parallel for
 for (int k = 0; k < ks; k++) {
 node temp = dque[k];
 char temp_board[ROW][COL];
@@ -211,10 +222,7 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][n
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
-cand.score=MH_EV(board2);
-if(cand.score==0){
-    return i+1;
-}    
+cand.score=MH_EV(board2);    
 cand.prev=j;
 fff[(4 * k) + j] = cand;
 }
@@ -226,7 +234,10 @@ fff[(4 * k) + j] = cand;
 }   
 dque.clear();
 vector<pair<int,int> >vv;
-for (int j = 0; j < 4 * ks; j++) {    
+for (int j = 0; j < 4 * ks; j++) {
+if(fff[j].score==0){
+    return i+1;
+}    
 vv.push_back(make_pair((int)fff[j].score,j));
 }
 sort(vv.begin(),vv.end());
@@ -302,6 +313,7 @@ for (int j = 0; j < 4 * ks; j++) {
 vv.push_back(make_pair((int)ggg[j].score,j));
 }
 sort(vv.begin(),vv.end());
+printf("depth=%d/%d,score=%d\n",i+1,TRN,vv[0].first);    
 int push_node=0;
 for (int j = 0; push_node < BW2 ;j++) {  
 if(j>=(int)vv.size()){break;}
@@ -343,9 +355,9 @@ zoblish_field[i1][i2][i3]=xor128();
 }
     
 
-//printf("path=%d\n",BEAM_SEARCH2(board));
+printf("path=%d\n",BEAM_SEARCH2(board));
 //printf("path=%d\n",BEAM_SEARCH(board));
-BEAM_SEARCH2(board);
+//BEAM_SEARCH2(board);
 cout<<bestans;
 
 return 0;
