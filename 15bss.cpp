@@ -51,7 +51,7 @@ using namespace std;
 #define COL 4
 #define TRN 126
 #define BW 150000
-#define BW2 100
+#define BW2 1
 
 typedef unsigned long long ll;
 
@@ -243,8 +243,10 @@ vector<pair<int,int> >vv;
 for (int j = 0; j < 4 * ks; j++) {
 if(fff[j].score==0){
     return i+1;
-}    
+}
+if(fff[j].score<125){
 vv.push_back(make_pair((int)fff[j].score,j));
+}
 }
 sort(vv.begin(),vv.end());
 int push_node=0;
@@ -299,7 +301,7 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx]
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
 cand.score=(char)BEAM_SEARCH(board2);  
-if(cand.score==-1){cand.score=125;}
+if(cand.score==-1){cand.score=124;}
 if(MH_EV(board2)==0){
     bestans=getans(board,cand.ans);
     return i+1;
@@ -316,7 +318,9 @@ ggg[(4 * k) + j] = cand;
 dque.clear();
 vector<pair<int,int> >vv;
 for (int j = 0; j < 4 * ks; j++) {
+if(ggg[j].score<125){
 vv.push_back(make_pair((int)ggg[j].score,j));
+}
 }
 sort(vv.begin(),vv.end());
 printf("depth=%d/%d,score=%d\n",i+1,TRN,vv[0].first);    
