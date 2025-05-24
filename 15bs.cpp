@@ -1,4 +1,15 @@
-//g++ -O2 -std=c++11 -fopenmp 15puzzle.cpp -o 15p
+//g++ -O2 -std=c++11 -fopenmp 15bs.cpp -o 15bs
+
+/*
+    
+14 15 8 12
+10 11 9 13
+2 6 5 1
+3 7 4 *
+
+path=66
+
+*/
 
 //#pragma warning(disable:4710)
 //#pragma warning(disable:4711)
@@ -37,7 +48,7 @@ using namespace std;
 #define ROW 4
 #define COL 4
 #define TRN 200
-#define BW 50000
+#define BW 1000000
 #define BW2 1
 
 typedef unsigned long long ll;
@@ -233,6 +244,7 @@ dq[fff[j].score].push_front(j);
 }
 //sort(vv.begin(),vv.end());
 int push_node=0;
+bool op=false;    
 char possible_score=0;
 for (int j = 0; push_node < BW ;j++) {    
 if(possible_score>=125){break;}
@@ -240,6 +252,10 @@ if((int)dq[(int)possible_score].size()==0){
 possible_score++;
 continue;
 }
+if(push_node==0&&!op){    
+printf("depth=%d/%d,score=%d\n",i+1,TRN,possible_score);
+op=true;    
+}    
 int p=dq[(int)possible_score][0];
 node n1=fff[p];
 dq[(int)possible_score].pop_front();
@@ -355,8 +371,8 @@ zoblish_field[i1][i2][i3]=xor128();
     
 
 //printf("path=%d\n",BEAM_SEARCH2(board));
-//printf("path=%d\n",BEAM_SEARCH(board));
-BEAM_SEARCH(board);
+printf("path=%d\n",BEAM_SEARCH(board));
+//BEAM_SEARCH(board);
 cout<<bestans;
 
 return 0;
