@@ -268,6 +268,7 @@ return -1;
 }
 
 int BEAM_SEARCH2(char board[ROW][COL]) {
+if(MH_EV(board)==0){return 0;}	
 int LIM=TRN;
 vector<int>pro_league;
 vector<node>dque;
