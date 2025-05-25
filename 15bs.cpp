@@ -185,6 +185,7 @@ return ans;
 }
 
 int BEAM_SEARCH(char board[ROW][COL]) {
+if(MH_EV(board)==0){return 0;}	
 vector<node>dque;
 node n0;
 n0.hash=calc_hash(board);
