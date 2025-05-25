@@ -241,7 +241,9 @@ deque<int>dq[150];
 vector<pair<int,int> >vv;
 for (int j = 0; j < 4 * ks; j++) {
 //vv.push_back(make_pair(fff[j].score,j));
+if(fff[j].score<125){
 dq[fff[j].score].push_front(j);
+}
 }
 //sort(vv.begin(),vv.end());
 int push_node=0;
