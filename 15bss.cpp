@@ -188,7 +188,7 @@ zero_pos = (char)dir;
 return ans;
 }
 
-int BEAM_SEARCH(char board[ROW][COL]) {
+int BEAM_SEARCH(char board[ROW][COL],int TURN) {
 if(MH_EV(board)==0){return 0;}
 if(shot%1000==0){printf("shot=%d\n",shot);}
 //printf("shot=%d\n",shot);
@@ -207,7 +207,7 @@ int dy[4] = { 0,-1,1,0 };
 
 emilib::HashMap<ll, bool> visited;
 
-for (int i = 0; i < TRN; i++) {
+for (int i = 0; i < TURN; i++) {
 int ks = (int)dque.size();
 #pragma omp parallel for
 for (int k = 0; k < ks; k++) {
@@ -268,6 +268,8 @@ return -1;
 }
 
 int BEAM_SEARCH2(char board[ROW][COL]) {
+int LIM=TRN;
+vector<int>pro_league;
 vector<node>dque;
 node n0;
 n0.hash=calc_hash(board);
@@ -278,9 +280,10 @@ n0.prev=-1;
 dque.push_back(n0);
 int dx[4] = { -1, 0,0,1 };
 int dy[4] = { 0,-1,1,0 };
-emilib::HashMap<ll, bool> visited;
+emilib::HashMap<ll, bool> visited;	
 for (int i = 0; i < TRN; i++) {
 int ks = (int)dque.size();
+pro_league.clear();	
 //#pragma omp parallel for
 for (int k = 0; k < ks; k++) {
 node temp = dque[k];
@@ -301,13 +304,20 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][n
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
-cand.score=(char)BEAM_SEARCH(board2);  
+int lim=LIM;
+if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim-1;}	
+cand.score=(char)BEAM_SEARCH(board2,lim-1);  
 if(cand.score==-1){cand.score=124;}
 if(MH_EV(board2)==0){
     bestans=getans(board,cand.ans);
     return i+1;
 }
-cand.prev=j;    
+cand.prev=j;
+int cs=(int)cand.score;
+if(cs<lim){	
+pro_league.push_back(cs);
+sort(pro_league.begin(),pro_league.end());
+}	
 ggg[(4 * k) + j] = cand;
 }
 else{
@@ -372,7 +382,7 @@ printf("path=%d\n",BEAM_SEARCH2(board));
 
 
 auto end = chrono::high_resolution_clock::now();
-//printf("path=%d\n",BEAM_SEARCH(board));
+//printf("path=%d\n",BEAM_SEARCH(board,TRN));
 //BEAM_SEARCH2(board);
 cout<<bestans;
 
