@@ -48,7 +48,7 @@ using namespace std;
 #define ROW 4
 #define COL 4
 #define TRN 200
-#define BW 1000000
+#define BW 50000
 #define BW2 1
 
 typedef unsigned long long ll;
@@ -223,6 +223,10 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx]
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
 cand.score=MH_EV(board2);
+if (cand.score == 0) {
+bestans=getans(board,cand.ans);
+return i+1;
+}
 cand.prev=j;
 fff[(4 * k) + j] = cand;
 }
@@ -236,16 +240,12 @@ dque.clear();
 deque<int>dq[150];
 vector<pair<int,int> >vv;
 for (int j = 0; j < 4 * ks; j++) {
-if (fff[j].score == 0) {
-bestans=getans(board,fff[j].ans);
-return i+1;
-}
 //vv.push_back(make_pair(fff[j].score,j));
 dq[fff[j].score].push_front(j);
 }
 //sort(vv.begin(),vv.end());
 int push_node=0;
-bool op=false;    
+//bool op=false;    
 char possible_score=0;
 for (int j = 0; push_node < BW ;j++) {    
 if(possible_score>=125){break;}
@@ -253,10 +253,6 @@ if((int)dq[(int)possible_score].size()==0){
 possible_score++;
 continue;
 }
-if(push_node==0&&!op){    
-printf("depth=%d/%d,score=%d\n",i+1,TRN,possible_score);
-op=true;    
-}    
 int p=dq[(int)possible_score][0];
 node n1=fff[p];
 dq[(int)possible_score].pop_front();
@@ -372,8 +368,8 @@ zoblish_field[i1][i2][i3]=xor128();
     
 
 //printf("path=%d\n",BEAM_SEARCH2(board));
-printf("path=%d\n",BEAM_SEARCH(board));
-//BEAM_SEARCH(board);
+//printf("path=%d\n",BEAM_SEARCH(board));
+BEAM_SEARCH(board);
 cout<<bestans;
 
 return 0;
