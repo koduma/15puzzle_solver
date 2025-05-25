@@ -306,7 +306,7 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx]
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
 int lim=LIM;
-if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim-1;}	
+if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim;}	
 cand.score=(char)BEAM_SEARCH(board2,lim-1);  
 if(cand.score==-1){cand.score=124;}
 if(MH_EV(board2)==0){
