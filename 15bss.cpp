@@ -54,9 +54,10 @@ using namespace std;
 #define BW2 300//BW2=1(115s)
 
 typedef unsigned long long ll;
+typedef unsigned char uc;
 
 struct node {
-char score;
+uc score;
 ll hash;
 ll ans[(TRN/21)+1];
 char prev;
@@ -124,8 +125,8 @@ zero_pos = (char)dir;
 return zero_pos;
 }
 
-char MH_EV(char board[ROW][COL]){
-    char ev=0;
+unsigned char MH_EV(char board[ROW][COL]){
+    uc ev=0;
     char pos[ROW*COL]={0};
     char goalboard[ROW*COL]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
     bool goal=true;
@@ -444,7 +445,7 @@ cand.prev=j;
 fff[(4 * k) + j] = cand;
 }
 else{
-cand.score=125;
+cand.score=200;
 fff[(4 * k) + j] = cand;
 }
 }
@@ -455,7 +456,7 @@ for (int j = 0; j < 4 * ks; j++) {
 if(fff[j].score==0){
     return i+1;
 }
-if(fff[j].score<125){
+if(fff[j].score<200){
 vv.push_back(make_pair((int)fff[j].score,j));
 }
 }
@@ -474,7 +475,7 @@ push_node++;
 }
 }
 }
-return -1;
+return 200;
 }
 
 int BEAM_SEARCH2(char board[ROW][COL]) {
@@ -516,9 +517,8 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx]
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
 int lim=LIM;
-if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim;}	
-cand.score=(char)BEAM_SEARCH(board2,lim-1);  
-if(cand.score==-1){cand.score=124;}
+if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim;}
+cand.score=(uc)BEAM_SEARCH(board2,lim-1);
 if(MH_EV(board2)==0){
     bestans=getans(board,cand.ans);
     return i+1;
@@ -532,7 +532,7 @@ sort(pro_league.begin(),pro_league.end());
 ggg[(4 * k) + j] = cand;
 }
 else{
-cand.score=125;
+cand.score=200;
 ggg[(4 * k) + j] = cand;
 }
 }
@@ -540,7 +540,7 @@ ggg[(4 * k) + j] = cand;
 dque.clear();
 vector<pair<int,int> >vv;
 for (int j = 0; j < 4 * ks; j++) {
-if(ggg[j].score<125){
+if(ggg[j].score<200){
 vv.push_back(make_pair((int)ggg[j].score,j));
 }
 }
@@ -560,7 +560,7 @@ push_node++;
 }
 }
 }
-return -1;
+return 200;
 }
 
 
