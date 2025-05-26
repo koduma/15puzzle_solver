@@ -62,11 +62,30 @@ ll ans[(TRN/21)+1];
 char prev;
 }fff[4*BW],ggg[4*BW2];
 
+struct k2p {
+    char tile[16];
+    char tile_pos[16];
+    char depth;
+    char zpos;
+
+    k2p(const char* s, const char* s2,char d,char zp) {
+    memcpy(tile, s, sizeof(tile));
+    memcpy(tile_pos, s2, sizeof(tile_pos));
+    depth = d;
+    zpos = zp;
+    }
+    
+    bool operator<(const k2p& other) const {
+        return depth < other.depth;
+    }
+};
+
 string bestans;
 
 int shot=0;
 
 ll zoblish_field[ROW][COL][ROW*COL];
+char k5p[3][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL];
 
 char operation(char board[ROW][COL], ll movei[(TRN/21)+1]) {   
 char pos[ROW * COL] = {0};
@@ -112,19 +131,20 @@ return zero_pos;
 char MH_EV(char board[ROW][COL]){
     char ev=0;
     char pos[ROW*COL]={0};
+    char goalboard[ROW*COL]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
+    bool goal=true;
     for(char i=0;i<ROW*COL;i++){
-    pos[(int)board[i/COL][i%COL]]=i;    
+    pos[(int)board[i/COL][i%COL]]=i;
+    if(board[i/COL][i%COL]!=goalboard[i]){goal=false;}
     }
-    for(char i=0;i<ROW*COL;i++){
-        if(i==0){continue;}
-        int correct_col=(i-1)%COL;
-        int correct_row=(i-1)/COL;
-        int cur_row=((int)pos[i])/COL;
-        int cur_col=((int)pos[i])%COL;
-        ev+=(char)(abs(cur_row-correct_row)+abs(cur_col-correct_col));
-    }
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    if(goal){return 0;}
+    ev+=k5p[0][pos[0]][pos[1]][pos[2]][pos[5]][pos[9]][pos[13]];
+    ev+=k5p[1][pos[0]][pos[3]][pos[4]][pos[6]][pos[7]][pos[8]];
+    ev+=k5p[2][pos[0]][pos[10]][pos[11]][pos[12]][pos[14]][pos[15]];
     return ev;
 }
+
 
 ll xor128() {//xorshift整数乱数
 	static unsigned long long rx = 123456789, ry = 362436069, rz = 521288629, rw = 88675123;
@@ -143,6 +163,200 @@ hash ^= zoblish_field[row][col][(int)num];
 }
 return hash;
 }
+
+void bfs1(){
+
+    priority_queue<k2p>pq;
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    //char tile[16];
+    //char tile_pos[16];    
+    //char depth;
+    //char zpos;
+    char tile[16];
+    char tile_pos[16];
+    for(char i=0;i<ROW*COL;i++){
+    tile[(int)i]=16;
+    tile_pos[(int)i]=-1;
+    }
+    tile[0]=1;
+    tile[1]=2;
+    tile[4]=5;
+    tile[8]=9;
+    tile[12]=13;
+    tile[15]=0;
+    tile_pos[1]=0;
+    tile_pos[2]=1;
+    tile_pos[5]=4;
+    tile_pos[9]=8;
+    tile_pos[13]=12;
+    tile_pos[0]=15;
+    char zps=15;
+    k2p kpt = {tile,tile_pos, 0,zps};
+    pq.push(kpt);
+    int dx[4] = { -1, 0,0,1 };
+    int dy[4] = { 0,-1,1,0 };
+    memset(k5p, -1, sizeof(k5p));
+    k5p[0][15][0][1][4][8][12]=0;
+    while(!pq.empty()){
+        k2p tp = pq.top();pq.pop();
+        int y=((int)tp.zpos)/COL;
+        int x=((int)tp.zpos)%COL;
+        for (int j = 0; j < 4; j++) {
+        if (0 <= x + dx[j] && x + dx[j] < COL &&
+            0 <= y + dy[j] && y + dy[j] < ROW) {
+            k2p next = tp;
+            int ny = y + dy[j];
+            int nx = x + dx[j];
+            int d = static_cast<int>(next.depth);
+            next.depth = (char)(d - 1);
+            char tileA = next.tile[next.zpos];
+            char tileB = next.tile[(ny * COL) + nx];
+            swap(next.tile[next.zpos], next.tile[(ny * COL) + nx]);
+            if (tileB != 16) {
+                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
+            } else {
+                next.tile_pos[0] = (ny * COL) + nx;
+            }
+            next.zpos = (ny * COL) + nx;
+            if (k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]]
+                    [(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]]==-1) {
+                k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]]
+                    [(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]] = -next.depth;   
+                pq.push(next);
+            }
+        }
+    }
+}
+}
+
+void bfs2(){
+
+    priority_queue<k2p>pq;
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    //char tile[16];
+    //char tile_pos[16];    
+    //char depth;
+    //char zpos;
+    char tile[16];
+    char tile_pos[16];
+    for(char i=0;i<ROW*COL;i++){
+    tile[(int)i]=16;
+    tile_pos[(int)i]=-1;
+    }
+    tile[2]=3;
+    tile[3]=4;
+    tile[5]=6;
+    tile[6]=7;
+    tile[7]=8;
+    tile[15]=0;
+    tile_pos[3]=2;
+    tile_pos[4]=3;
+    tile_pos[6]=5;
+    tile_pos[7]=6;
+    tile_pos[8]=7;
+    tile_pos[0]=15;
+    char zps=15;
+    k2p kpt = {tile,tile_pos, 0,zps};
+    pq.push(kpt);
+    int dx[4] = { -1, 0,0,1 };
+    int dy[4] = { 0,-1,1,0 };
+    k5p[1][15][2][3][5][6][7]=0;
+    while(!pq.empty()){
+        k2p tp = pq.top();pq.pop();
+        int y=((int)tp.zpos)/COL;
+        int x=((int)tp.zpos)%COL;
+        for (int j = 0; j < 4; j++) {
+        if (0 <= x + dx[j] && x + dx[j] < COL &&
+            0 <= y + dy[j] && y + dy[j] < ROW) {
+            k2p next = tp;
+            int ny = y + dy[j];
+            int nx = x + dx[j];
+            int d = static_cast<int>(next.depth);
+            next.depth = (char)(d - 1);
+            char tileA = next.tile[next.zpos];
+            char tileB = next.tile[(ny * COL) + nx];
+            swap(next.tile[next.zpos], next.tile[(ny * COL) + nx]);
+            if (tileB != 16) {
+                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
+            } else {
+                next.tile_pos[0] = (ny * COL) + nx;
+            }
+            next.zpos = (ny * COL) + nx;
+            if (k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]]
+                    [(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]]==-1) {
+                k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]]
+                    [(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]] = -next.depth;   
+                pq.push(next);
+            }
+        }
+    }
+}
+}
+
+void bfs3(){
+
+    priority_queue<k2p>pq;
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    //char tile[16];
+    //char tile_pos[16];    
+    //char depth;
+    //char zpos;
+    char tile[16];
+    char tile_pos[16];
+    for(char i=0;i<ROW*COL;i++){
+    tile[(int)i]=16;
+    tile_pos[(int)i]=-1;
+    }
+    tile[9]=10;
+    tile[10]=11;
+    tile[11]=12;
+    tile[13]=14;
+    tile[14]=15;
+    tile[15]=0;
+    tile_pos[10]=9;
+    tile_pos[11]=10;
+    tile_pos[12]=11;
+    tile_pos[14]=13;
+    tile_pos[15]=14;
+    tile_pos[0]=15;
+    char zps=15;
+    k2p kpt = {tile,tile_pos, 0,zps};
+    pq.push(kpt);
+    int dx[4] = { -1, 0,0,1 };
+    int dy[4] = { 0,-1,1,0 };
+    k5p[2][15][9][10][11][13][14]=0;
+    while(!pq.empty()){
+        k2p tp = pq.top();pq.pop();
+        int y=((int)tp.zpos)/COL;
+        int x=((int)tp.zpos)%COL;
+        for (int j = 0; j < 4; j++) {
+        if (0 <= x + dx[j] && x + dx[j] < COL &&
+            0 <= y + dy[j] && y + dy[j] < ROW) {
+            k2p next = tp;
+            int ny = y + dy[j];
+            int nx = x + dx[j];
+            int d = static_cast<int>(next.depth);
+            next.depth = (char)(d - 1);
+            char tileA = next.tile[next.zpos];
+            char tileB = next.tile[(ny * COL) + nx];
+            swap(next.tile[next.zpos], next.tile[(ny * COL) + nx]);
+            if (tileB != 16) {
+                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
+            } else {
+                next.tile_pos[0] = (ny * COL) + nx;
+            }
+            next.zpos = (ny * COL) + nx;
+            if (k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]]
+                    [(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]]==-1) {
+                k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]]
+                    [(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]] = -next.depth;   
+                pq.push(next);
+            }
+        }
+    }
+}
+}
+
 string getans(char board[ROW][COL],ll movei[(TRN/21)+1]){
 string ans="";
 char pos[ROW * COL] = {0};
@@ -367,6 +581,8 @@ else{board[i][j]=stoi(a[i][j]);}
 }
 }
 
+auto start = chrono::high_resolution_clock::now();
+
 int i1, i2, i3;
 for(i1=0;i1<ROW;++i1){
 for(i2=0;i2<COL;++i2){
@@ -376,8 +592,9 @@ zoblish_field[i1][i2][i3]=xor128();
 }
 }
 
-auto start = chrono::high_resolution_clock::now();
-    
+bfs1();
+bfs2();
+bfs3();    
 
 printf("path=%d\n",BEAM_SEARCH2(board));
 
