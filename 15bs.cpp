@@ -60,9 +60,28 @@ ll ans[(TRN/21)+1];
 char prev;
 }fff[4*BW],ggg[4*BW2];
 
+struct k2p {
+    char tile[16];
+    char tile_pos[16];
+    char depth;
+    char zpos;
+
+    k2p(const char* s, const char* s2,char d,char zp) {
+    memcpy(tile, s, sizeof(tile));
+    memcpy(tile_pos, s2, sizeof(tile_pos));
+    depth = d;
+    zpos = zp;
+    }
+    
+    bool operator<(const k2p& other) const {
+        return depth < other.depth;
+    }
+};
+
 string bestans;
 
-ll zoblish_field[ROW][COL][ROW*COL];
+ll zoblish_field[ROW][COL][(ROW*COL)+1];
+char k5p[3][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL];
 
 char operation(char board[ROW][COL], ll movei[(TRN/21)+1]) {   
 char pos[ROW * COL] = {0};
@@ -108,17 +127,17 @@ return zero_pos;
 char MH_EV(char board[ROW][COL]){
     char ev=0;
     char pos[ROW*COL]={0};
+    char goalboard[ROW*COL]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
+    bool goal=true;
     for(char i=0;i<ROW*COL;i++){
-    pos[(int)board[i/COL][i%COL]]=i;    
+    pos[(int)board[i/COL][i%COL]]=i;
+    if(board[i/COL][i%COL]!=goalboard[i]){goal=false;}
     }
-    for(char i=0;i<ROW*COL;i++){
-        if(i==0){continue;}
-        int correct_col=(i-1)%COL;
-        int correct_row=(i-1)/COL;
-        int cur_row=((int)pos[i])/COL;
-        int cur_col=((int)pos[i])%COL;
-        ev+=(char)(abs(cur_row-correct_row)+abs(cur_col-correct_col));
-    }
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    if(goal){return 0;}
+    ev+=k5p[0][pos[0]][pos[1]][pos[2]][pos[5]][pos[9]][pos[13]];
+    ev+=k5p[1][pos[0]][pos[3]][pos[4]][pos[6]][pos[7]][pos[8]];
+    ev+=k5p[2][pos[0]][pos[10]][pos[11]][pos[12]][pos[14]][pos[15]];
     return ev;
 }
 
@@ -139,6 +158,200 @@ hash ^= zoblish_field[row][col][(int)num];
 }
 return hash;
 }
+
+void bfs1(){
+
+    priority_queue<k2p>pq;
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    //char tile[16];
+    //char tile_pos[16];    
+    //char depth;
+    //char zpos;
+    char tile[16];
+    char tile_pos[16];
+    for(char i=0;i<ROW*COL;i++){
+    tile[(int)i]=16;
+    tile_pos[(int)i]=-1;
+    }
+    tile[0]=1;
+    tile[1]=2;
+    tile[4]=5;
+    tile[8]=9;
+    tile[12]=13;
+    tile[15]=0;
+    tile_pos[1]=0;
+    tile_pos[2]=1;
+    tile_pos[5]=4;
+    tile_pos[9]=8;
+    tile_pos[13]=12;
+    tile_pos[0]=15;
+    char zps=15;
+    k2p kpt = {tile,tile_pos, 0,zps};
+    pq.push(kpt);
+    int dx[4] = { -1, 0,0,1 };
+    int dy[4] = { 0,-1,1,0 };
+    memset(k5p, -1, sizeof(k5p));
+    k5p[0][15][0][1][4][8][12]=0;
+    while(!pq.empty()){
+        k2p tp = pq.top();pq.pop();
+        int y=((int)tp.zpos)/COL;
+        int x=((int)tp.zpos)%COL;
+        for (int j = 0; j < 4; j++) {
+        if (0 <= x + dx[j] && x + dx[j] < COL &&
+            0 <= y + dy[j] && y + dy[j] < ROW) {
+            k2p next = tp;
+            int ny = y + dy[j];
+            int nx = x + dx[j];
+            int d = static_cast<int>(next.depth);
+            next.depth = (char)(d - 1);
+            char tileA = next.tile[next.zpos];
+            char tileB = next.tile[(ny * COL) + nx];
+            swap(next.tile[next.zpos], next.tile[(ny * COL) + nx]);
+            if (tileB != 16) {
+                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
+            } else {
+                next.tile_pos[0] = (ny * COL) + nx;
+            }
+            next.zpos = (ny * COL) + nx;
+            if (k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]]
+                    [(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]]==-1) {
+                k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]]
+                    [(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]] = -next.depth;   
+                pq.push(next);
+            }
+        }
+    }
+}
+}
+
+void bfs2(){
+
+    priority_queue<k2p>pq;
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    //char tile[16];
+    //char tile_pos[16];    
+    //char depth;
+    //char zpos;
+    char tile[16];
+    char tile_pos[16];
+    for(char i=0;i<ROW*COL;i++){
+    tile[(int)i]=16;
+    tile_pos[(int)i]=-1;
+    }
+    tile[2]=3;
+    tile[3]=4;
+    tile[5]=6;
+    tile[6]=7;
+    tile[7]=8;
+    tile[15]=0;
+    tile_pos[3]=2;
+    tile_pos[4]=3;
+    tile_pos[6]=5;
+    tile_pos[7]=6;
+    tile_pos[8]=7;
+    tile_pos[0]=15;
+    char zps=15;
+    k2p kpt = {tile,tile_pos, 0,zps};
+    pq.push(kpt);
+    int dx[4] = { -1, 0,0,1 };
+    int dy[4] = { 0,-1,1,0 };
+    k5p[1][15][2][3][5][6][7]=0;
+    while(!pq.empty()){
+        k2p tp = pq.top();pq.pop();
+        int y=((int)tp.zpos)/COL;
+        int x=((int)tp.zpos)%COL;
+        for (int j = 0; j < 4; j++) {
+        if (0 <= x + dx[j] && x + dx[j] < COL &&
+            0 <= y + dy[j] && y + dy[j] < ROW) {
+            k2p next = tp;
+            int ny = y + dy[j];
+            int nx = x + dx[j];
+            int d = static_cast<int>(next.depth);
+            next.depth = (char)(d - 1);
+            char tileA = next.tile[next.zpos];
+            char tileB = next.tile[(ny * COL) + nx];
+            swap(next.tile[next.zpos], next.tile[(ny * COL) + nx]);
+            if (tileB != 16) {
+                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
+            } else {
+                next.tile_pos[0] = (ny * COL) + nx;
+            }
+            next.zpos = (ny * COL) + nx;
+            if (k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]]
+                    [(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]]==-1) {
+                k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]]
+                    [(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]] = -next.depth;   
+                pq.push(next);
+            }
+        }
+    }
+}
+}
+
+void bfs3(){
+
+    priority_queue<k2p>pq;
+    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
+    //char tile[16];
+    //char tile_pos[16];    
+    //char depth;
+    //char zpos;
+    char tile[16];
+    char tile_pos[16];
+    for(char i=0;i<ROW*COL;i++){
+    tile[(int)i]=16;
+    tile_pos[(int)i]=-1;
+    }
+    tile[9]=10;
+    tile[10]=11;
+    tile[11]=12;
+    tile[13]=14;
+    tile[14]=15;
+    tile[15]=0;
+    tile_pos[10]=9;
+    tile_pos[11]=10;
+    tile_pos[12]=11;
+    tile_pos[14]=13;
+    tile_pos[15]=14;
+    tile_pos[0]=15;
+    char zps=15;
+    k2p kpt = {tile,tile_pos, 0,zps};
+    pq.push(kpt);
+    int dx[4] = { -1, 0,0,1 };
+    int dy[4] = { 0,-1,1,0 };
+    k5p[2][15][9][10][11][13][14]=0;
+    while(!pq.empty()){
+        k2p tp = pq.top();pq.pop();
+        int y=((int)tp.zpos)/COL;
+        int x=((int)tp.zpos)%COL;
+        for (int j = 0; j < 4; j++) {
+        if (0 <= x + dx[j] && x + dx[j] < COL &&
+            0 <= y + dy[j] && y + dy[j] < ROW) {
+            k2p next = tp;
+            int ny = y + dy[j];
+            int nx = x + dx[j];
+            int d = static_cast<int>(next.depth);
+            next.depth = (char)(d - 1);
+            char tileA = next.tile[next.zpos];
+            char tileB = next.tile[(ny * COL) + nx];
+            swap(next.tile[next.zpos], next.tile[(ny * COL) + nx]);
+            if (tileB != 16) {
+                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
+            } else {
+                next.tile_pos[0] = (ny * COL) + nx;
+            }
+            next.zpos = (ny * COL) + nx;
+            if (k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]]
+                    [(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]]==-1) {
+                k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]]
+                    [(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]] = -next.depth;   
+                pq.push(next);
+            }
+        }
+    }
+}
+}
+
 string getans(char board[ROW][COL],ll movei[(TRN/21)+1]){
 string ans="";
 char pos[ROW * COL] = {0};
@@ -184,8 +397,8 @@ zero_pos = (char)dir;
 return ans;
 }
 
-int BEAM_SEARCH(char board[ROW][COL]) {
-if(MH_EV(board)==0){return 0;}	
+int BEAM_SEARCH(char board[ROW][COL],int TURN) {
+if(MH_EV(board)==0){return 0;}    
 vector<node>dque;
 node n0;
 n0.hash=calc_hash(board);
@@ -198,9 +411,9 @@ dque.push_back(n0);
 int dx[4] = { -1, 0,0,1 };
 int dy[4] = { 0,-1,1,0 };
 
-unordered_map<ll, bool> visited;
+unordered_map<ll,bool>visited;
 
-for (int i = 0; i < TRN; i++) {
+for (int i = 0; i < TURN; i++) {
 int ks = (int)dque.size();
 //#pragma omp parallel for
 for (int k = 0; k < ks; k++) {
@@ -222,11 +435,7 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][n
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
-cand.score=MH_EV(board2);
-if (cand.score == 0) {
-bestans=getans(board,cand.ans);
-return i+1;
-}
+cand.score=MH_EV(board2);    
 cand.prev=j;
 fff[(4 * k) + j] = cand;
 }
@@ -237,102 +446,22 @@ fff[(4 * k) + j] = cand;
 }
 }   
 dque.clear();
-deque<int>dq[150];
 vector<pair<int,int> >vv;
 for (int j = 0; j < 4 * ks; j++) {
-//vv.push_back(make_pair(fff[j].score,j));
+if(fff[j].score==0){
+    bestans=getans(board,fff[j].ans);
+    return i+1;
+}
 if(fff[j].score<125){
-dq[fff[j].score].push_front(j);
+vv.push_back(make_pair((int)fff[j].score,j));
 }
 }
-//sort(vv.begin(),vv.end());
+sort(vv.begin(),vv.end());
 int push_node=0;
-//bool op=false;    
-char possible_score=0;
-for (int j = 0; push_node < BW ;j++) {    
-if(possible_score>=125){break;}
-if((int)dq[(int)possible_score].size()==0){
-possible_score++;
-continue;
-}
-int p=dq[(int)possible_score][0];
+for (int j = 0; push_node < BW ;j++) {  
+if(j>=(int)vv.size()){break;}
+int p=vv[j].second;
 node n1=fff[p];
-dq[(int)possible_score].pop_front();
-if (i < TRN - 1) {
-if(!visited[n1.hash]){
-visited[n1.hash]=true;
-dque.push_back(n1);
-push_node++;
-}
-}
-}  
-}
-return -1;
-}
-
-int BEAM_SEARCH2(char board[ROW][COL]) {
-vector<node>dque;
-node n0;
-n0.hash=calc_hash(board);
-for(int i=0;i<=(TRN/21);i++){
-n0.ans[i]=0ll;
-}
-n0.prev=-1;    
-dque.push_back(n0);
-int dx[4] = { -1, 0,0,1 };
-int dy[4] = { 0,-1,1,0 };
-unordered_map<ll, bool> visited;
-for (int i = 0; i < TRN; i++) {
-int ks = (int)dque.size();
-//#pragma omp parallel for
-for (int k = 0; k < ks; k++) {
-node temp = dque[k];
-char temp_board[ROW][COL];
-memcpy(temp_board, board, sizeof(temp_board));
-char zero_pos=operation(temp_board, temp.ans);
-for (int j = 0; j < 4; j++) {
-node cand = temp;
-int xxx=((int)zero_pos)%COL;
-int yyy=((int)zero_pos)/COL;
-if (0 <= xxx + dx[j] && xxx + dx[j] < COL &&
-0 <= yyy + dy[j] && yyy + dy[j] < ROW && cand.prev+j!=3) {
-char board2[ROW][COL];
-memcpy(board2,temp_board,sizeof(board2));
-int ny=yyy + dy[j];
-int nx=xxx + dx[j];
-cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
-cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
-cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
-swap(board2[ny][nx],board2[yyy][xxx]);
-cand.score=(char)BEAM_SEARCH(board2);
-if(cand.score==-1){cand.score=125;}
-if(cand.score<10){if(MH_EV(board2)==0){bestans=getans(board,cand.ans);return i+1;}}
-cand.prev=j;    
-ggg[(4 * k) + j] = cand;
-}
-else{
-cand.score=125;
-ggg[(4 * k) + j] = cand;
-}
-}
-}
-dque.clear();
-deque<int>dq[150];
-vector<pair<int,int> >vv;
-for (int j = 0; j < 4 * ks; j++) {
-dq[ggg[j].score].push_front(j);
-}
-int push_node=0;
-char possible_score=0;
-for (int j = 0; push_node < BW2 ;j++) {  
-if(possible_score>=125){break;}
-if((int)dq[(int)possible_score].size()==0){
-possible_score++;
-continue;
-}
-int p=dq[(int)possible_score][0];
-node n1=ggg[p];
-dq[(int)possible_score].pop_front();
 if (i < TRN - 1) {
 if(!visited[n1.hash]){
 visited[n1.hash]=true;
@@ -362,16 +491,20 @@ else{board[i][j]=stoi(a[i][j]);}
 int i1, i2, i3;
 for(i1=0;i1<ROW;++i1){
 for(i2=0;i2<COL;++i2){
-for(i3=0;i3<ROW*COL;i3++){
+for(i3=0;i3<=ROW*COL;i3++){
 zoblish_field[i1][i2][i3]=xor128();
 }
 }
 }
+
+bfs1();
+bfs2();
+bfs3(); 
     
 
 //printf("path=%d\n",BEAM_SEARCH2(board));
-//printf("path=%d\n",BEAM_SEARCH(board));
-BEAM_SEARCH(board);
+printf("path=%d\n",BEAM_SEARCH(board,TRN));
+//BEAM_SEARCH(board,TRN);
 cout<<bestans;
 
 return 0;
