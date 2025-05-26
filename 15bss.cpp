@@ -1,4 +1,5 @@
-//g++ -O2 -std=c++11 -fopenmp -lpthread 15bss.cpp loguru.cpp -o 15bss -mcmodel=large
+//Linux:g++ -O2 -std=c++11 -fopenmp -lpthread 15bss.cpp loguru.cpp -o 15bss -mcmodel=large -ldl
+//Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -lpthread 15bss.cpp loguru.cpp -o 15bss -mcmodel=large
 
 /*
     
