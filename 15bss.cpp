@@ -502,7 +502,7 @@ int zero_col = ((int)zero_pos) % COL;
 int move_row = dir / COL;
 int move_col = dir % COL;
 
-ans+=to_string((int)board[move_row][move_col])+"\n";    
+ans+=to_string((int)board[move_row][move_col])+",";    
             
 swap(board[zero_row][zero_col], board[move_row][move_col]);
 
@@ -717,7 +717,7 @@ printf("path=%d\n",BEAM_SEARCH2(board));
 auto end = chrono::high_resolution_clock::now();
 //printf("path=%d\n",BEAM_SEARCH(board,TRN));
 //BEAM_SEARCH2(board);
-cout<<bestans;
+cout<<bestans<<endl;
 
 auto duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
