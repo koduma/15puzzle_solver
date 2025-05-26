@@ -1,4 +1,4 @@
-//g++ -O2 -std=c++11 -fopenmp 15bs.cpp -o 15bs
+//g++ -O2 -std=c++11 15bs.cpp -o 15bs
 
 /*
     
@@ -52,9 +52,10 @@ using namespace std;
 #define BW2 1
 
 typedef unsigned long long ll;
+typedef unsigned char uc;
 
 struct node {
-char score;
+uc score;
 ll hash;
 ll ans[(TRN/21)+1];
 char prev;
@@ -72,6 +73,10 @@ struct k2p {
     depth = d;
     zpos = zp;
     }
+    
+    //bool operator<(const k2p& other) const {
+        //return depth < other.depth;
+    //}
 };
 
 string bestans;
@@ -120,8 +125,8 @@ zero_pos = (char)dir;
 return zero_pos;
 }
 
-char MH_EV(char board[ROW][COL]){
-    char ev=0;
+unsigned char MH_EV(char board[ROW][COL]){
+    uc ev=0;
     char pos[ROW*COL]={0};
     char goalboard[ROW*COL]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
     bool goal=true;
@@ -134,6 +139,7 @@ char MH_EV(char board[ROW][COL]){
     ev+=k5p[0][pos[0]][pos[1]][pos[2]][pos[5]][pos[9]][pos[13]];
     ev+=k5p[1][pos[0]][pos[3]][pos[4]][pos[6]][pos[7]][pos[8]];
     ev+=k5p[2][pos[0]][pos[10]][pos[11]][pos[12]][pos[14]][pos[15]];
+    
     return ev;
 }
 
@@ -431,12 +437,12 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][n
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
-cand.score=MH_EV(board2);    
+cand.score=MH_EV(board2);
 cand.prev=j;
 fff[(4 * k) + j] = cand;
 }
 else{
-cand.score=125;
+cand.score=200;
 fff[(4 * k) + j] = cand;
 }
 }
@@ -448,12 +454,13 @@ if(fff[j].score==0){
     bestans=getans(board,fff[j].ans);
     return i+1;
 }
-if(fff[j].score<125){
+if(fff[j].score<200){
 vv.push_back(make_pair((int)fff[j].score,j));
 }
 }
 sort(vv.begin(),vv.end());
 int push_node=0;
+bool can_o=true;
 for (int j = 0; push_node < BW ;j++) {  
 if(j>=(int)vv.size()){break;}
 int p=vv[j].second;
@@ -471,7 +478,7 @@ return -1;
 }
 
 
-int main() {
+int main() {    
     
 char board[ROW][COL]={0};
 string a[ROW][COL];
@@ -495,12 +502,12 @@ zoblish_field[i1][i2][i3]=xor128();
 
 bfs1();
 bfs2();
-bfs3(); 
+bfs3();
     
 
 //printf("path=%d\n",BEAM_SEARCH2(board));
-printf("path=%d\n",BEAM_SEARCH(board,TRN));
-//BEAM_SEARCH(board,TRN);
+//printf("path=%d\n",BEAM_SEARCH(board,TRN));
+BEAM_SEARCH(board,TRN);
 cout<<bestans;
 
 return 0;
