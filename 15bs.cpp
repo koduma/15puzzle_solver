@@ -72,10 +72,6 @@ struct k2p {
     depth = d;
     zpos = zp;
     }
-    
-    bool operator<(const k2p& other) const {
-        return depth < other.depth;
-    }
 };
 
 string bestans;
@@ -161,7 +157,7 @@ return hash;
 
 void bfs1(){
 
-    priority_queue<k2p>pq;
+    queue<k2p>pq;
     //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
     //char tile[16];
     //char tile_pos[16];    
@@ -193,7 +189,7 @@ void bfs1(){
     memset(k5p, -1, sizeof(k5p));
     k5p[0][15][0][1][4][8][12]=0;
     while(!pq.empty()){
-        k2p tp = pq.top();pq.pop();
+        k2p tp = pq.front();pq.pop();
         int y=((int)tp.zpos)/COL;
         int x=((int)tp.zpos)%COL;
         for (int j = 0; j < 4; j++) {
@@ -226,7 +222,7 @@ void bfs1(){
 
 void bfs2(){
 
-    priority_queue<k2p>pq;
+    queue<k2p>pq;
     //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
     //char tile[16];
     //char tile_pos[16];    
@@ -257,7 +253,7 @@ void bfs2(){
     int dy[4] = { 0,-1,1,0 };
     k5p[1][15][2][3][5][6][7]=0;
     while(!pq.empty()){
-        k2p tp = pq.top();pq.pop();
+        k2p tp = pq.front();pq.pop();
         int y=((int)tp.zpos)/COL;
         int x=((int)tp.zpos)%COL;
         for (int j = 0; j < 4; j++) {
@@ -290,7 +286,7 @@ void bfs2(){
 
 void bfs3(){
 
-    priority_queue<k2p>pq;
+    queue<k2p>pq;
     //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
     //char tile[16];
     //char tile_pos[16];    
@@ -321,7 +317,7 @@ void bfs3(){
     int dy[4] = { 0,-1,1,0 };
     k5p[2][15][9][10][11][13][14]=0;
     while(!pq.empty()){
-        k2p tp = pq.top();pq.pop();
+        k2p tp = pq.front();pq.pop();
         int y=((int)tp.zpos)/COL;
         int x=((int)tp.zpos)%COL;
         for (int j = 0; j < 4; j++) {
