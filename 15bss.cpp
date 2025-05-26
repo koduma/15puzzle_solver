@@ -50,8 +50,8 @@ using namespace std;
 #define ROW 4
 #define COL 4
 #define TRN 126
-#define BW 150000
-#define BW2 300//BW2=1(145s)
+#define BW 100000
+#define BW2 300//BW2=1(115s)
 
 typedef unsigned long long ll;
 
