@@ -170,7 +170,7 @@ using namespace std;
 #define COL 4
 #define TRN 126
 #define BW 100000
-#define BW2 300//BW2=1(115s)
+#define BW2 100//BW2=1(115s)
 
 typedef unsigned long long ll;
 typedef unsigned char uc;
