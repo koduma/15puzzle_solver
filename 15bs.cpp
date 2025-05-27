@@ -396,7 +396,7 @@ int zero_col = ((int)zero_pos) % COL;
 int move_row = dir / COL;
 int move_col = dir % COL;
 
-ans+=to_string((int)board[move_row][move_col])+",";
+ans+=to_string((int)board[move_row][move_col])+"\n";
 
 char tmp=board[zero_row][zero_col];
 board[zero_row][zero_col]=board[move_row][move_col];
