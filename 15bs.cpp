@@ -89,8 +89,8 @@ char operation(char board[ROW][COL], ll movei[(TRN/21)+1]) {
 char pos[ROW * COL] = {0};
 char number[ROW * COL] = {0};
 for (char i = 0; i < ROW * COL; i++) {
-pos[(int)board[i / COL][i % COL]] = i;
-number[(int)i]=board[i/COL][i%COL];
+pos[(int)board[((int)i) / COL][((int)i) % COL]] = i;
+number[(int)i]=board[((int)i)/COL][((int)i)%COL];
 }
 char zero_pos=pos[0];
 for (char i = 0; i <= TRN / 21; i++) {    
@@ -134,7 +134,7 @@ unsigned char MH_EV(char board[ROW][COL],bool cut){
     char goalboard[ROW*COL]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
     bool goal=true;
     for(char i=0;i<ROW*COL;i++){
-    pos[(int)board[i/COL][i%COL]]=i;
+    pos[(int)board[((int)i)/COL][((int)i)%COL]]=i;
     if(board[((int)i)/COL][((int)i)%COL]!=goalboard[(int)i]){goal=false;}
     }
     //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
@@ -359,8 +359,8 @@ string ans="";
 char pos[ROW * COL] = {0};
 char number[ROW * COL] = {0};
 for (char i = 0; i < ROW * COL; i++) {
-pos[(int)board[i / COL][i % COL]] = i;
-number[(int)i]=board[i/COL][i%COL];
+pos[(int)board[((int)i) / COL][((int)i) % COL]] = i;
+number[(int)i]=board[((int)i)/COL][((int)i)%COL];
 }
 char zero_pos=pos[0];
 for (char i = 0; i <= TRN / 21; i++) {
