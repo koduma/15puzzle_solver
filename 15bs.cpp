@@ -48,7 +48,7 @@ using namespace std;
 #define ROW 4
 #define COL 4
 #define TRN 200
-#define BW 50000
+#define BW 10000
 #define BW2 1
 
 typedef unsigned long long ll;
@@ -125,7 +125,7 @@ zero_pos = (char)dir;
 return zero_pos;
 }
 
-unsigned char MH_EV(char board[ROW][COL]){
+unsigned char MH_EV(char board[ROW][COL],bool cut){
     uc ev=0;
     char pos[ROW*COL]={0};
     char goalboard[ROW*COL]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
@@ -136,11 +136,15 @@ unsigned char MH_EV(char board[ROW][COL]){
     }
     //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
     if(goal){return 0;}
+    if(!cut){
     ev+=k5p[0][pos[0]][pos[1]][pos[2]][pos[5]][pos[9]][pos[13]];
     ev+=k5p[1][pos[0]][pos[3]][pos[4]][pos[6]][pos[7]][pos[8]];
-    ev+=k5p[2][pos[0]][pos[10]][pos[11]][pos[12]][pos[14]][pos[15]];
-    
+    ev+=k5p[2][pos[0]][pos[10]][pos[11]][pos[12]][pos[14]][pos[15]];    
     return ev;
+    }
+    else{
+    return 1;    
+    }
 }
 
 ll xor128() {//xorshift整数乱数
@@ -192,7 +196,6 @@ void bfs1(){
     pq.push(kpt);
     int dx[4] = { -1, 0,0,1 };
     int dy[4] = { 0,-1,1,0 };
-    memset(k5p, -1, sizeof(k5p));
     k5p[0][15][0][1][4][8][12]=0;
     while(!pq.empty()){
         k2p tp = pq.front();pq.pop();
@@ -396,8 +399,8 @@ zero_pos = (char)dir;
 return ans;
 }
 
-int BEAM_SEARCH(char board[ROW][COL],int TURN) {
-if(MH_EV(board)==0){return 0;}    
+int BEAM_SEARCH(char board[ROW][COL],int TURN,bool cut) {
+if(MH_EV(board,cut)==0){return 0;}    
 vector<node>dque;
 node n0;
 n0.hash=calc_hash(board);
@@ -434,7 +437,7 @@ cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][n
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
 swap(board2[ny][nx],board2[yyy][xxx]);
-cand.score=MH_EV(board2);
+cand.score=MH_EV(board2,cut);   
 cand.prev=j;
 fff[(4 * k) + j] = cand;
 }
@@ -496,7 +499,15 @@ zoblish_field[i1][i2][i3]=xor128();
 }
 }
 }
+    
+memset(k5p, -1, sizeof(k5p));
 
+int p=BEAM_SEARCH(board,8,true);
+if(p>0){
+    cout<<bestans;
+    return 0;
+}    
+    
 bfs1();
 bfs2();
 bfs3();
@@ -504,7 +515,7 @@ bfs3();
 
 //printf("path=%d\n",BEAM_SEARCH2(board));
 //printf("path=%d\n",BEAM_SEARCH(board,TRN));
-BEAM_SEARCH(board,TRN);
+BEAM_SEARCH(board,TRN,false);
 cout<<bestans;
 
 return 0;
