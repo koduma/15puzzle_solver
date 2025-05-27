@@ -334,10 +334,9 @@ void bfs1(){
                 next.tile_pos[0] = (ny * COL) + nx;
             }
             next.zpos = (ny * COL) + nx;
-            if (k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]]
-                    [(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]]==-1) {
-                k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]]
-                    [(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]] = -next.depth;   
+            char* state_ptr = &k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]][(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]];
+            if (*state_ptr == -1) {
+                *state_ptr = -next.depth;   
                 pq.push(next);
             }
         }
@@ -398,10 +397,9 @@ void bfs2(){
                 next.tile_pos[0] = (ny * COL) + nx;
             }
             next.zpos = (ny * COL) + nx;
-            if (k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]]
-                    [(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]]==-1) {
-                k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]]
-                    [(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]] = -next.depth;   
+            char* state_ptr = &k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]][(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]];
+            if (*state_ptr == -1) {
+                *state_ptr = -next.depth;   
                 pq.push(next);
             }
         }
@@ -462,10 +460,9 @@ void bfs3(){
                 next.tile_pos[0] = (ny * COL) + nx;
             }
             next.zpos = (ny * COL) + nx;
-            if (k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]]
-                    [(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]]==-1) {
-                k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]]
-                    [(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]] = -next.depth;   
+            char* state_ptr = &k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]][(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]];
+            if (*state_ptr == -1) {
+                *state_ptr = -next.depth;   
                 pq.push(next);
             }
         }
