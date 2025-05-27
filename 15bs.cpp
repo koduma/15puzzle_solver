@@ -200,7 +200,6 @@ void bfs1(){
     pq.push(kpt);
     int dx[4] = { -1, 0,0,1 };
     int dy[4] = { 0,-1,1,0 };
-    memset(k5p, -1, sizeof(k5p));
     k5p[0][15][0][1][4][8][12]=0;
     while(!pq.empty()){
         k2p tp = pq.front();pq.pop();
