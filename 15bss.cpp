@@ -710,10 +710,10 @@ bfs3();
 printf("path=%d\n",BEAM_SEARCH2(board));
 
 
-//auto end = chrono::high_resolution_clock::now();
+auto end = chrono::high_resolution_clock::now();
 //printf("path=%d\n",BEAM_SEARCH(board,TRN));
 //BEAM_SEARCH2(board);
-cout<<bestans;
+cout<<bestans<<endl;
 
 auto duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
