@@ -207,8 +207,8 @@ char operation(char board[ROW][COL], ll movei[(TRN/21)+1]) {
 char pos[ROW * COL] = {0};
 char number[ROW * COL] = {0};
 for (char i = 0; i < ROW * COL; i++) {
-pos[(int)board[i / COL][i % COL]] = i;
-number[(int)i]=board[i/COL][i%COL];
+pos[(int)board[((int)i) / COL][((int)i) % COL]] = i;
+number[(int)i]=board[((int)i)/COL][((int)i)%COL];
 }
 char zero_pos=pos[0];
 for (char i = 0; i <= TRN / 21; i++) {    
@@ -230,12 +230,14 @@ int zero_row = ((int)zero_pos) / COL;
 int zero_col = ((int)zero_pos) % COL;
 int move_row = dir / COL;
 int move_col = dir % COL;
-            
-swap(board[zero_row][zero_col], board[move_row][move_col]);
+	
+char tmp=board[zero_row][zero_col];
+board[zero_row][zero_col]=board[move_row][move_col];
+board[move_row][move_col]=tmp;
 
 pos[0] = (char)dir;
 pos[(int)number[dir]] = zero_pos;
-char tmp=number[dir];
+tmp=number[dir];
 number[dir]=number[(int)zero_pos];
 number[(int)zero_pos]=tmp;
 
@@ -251,7 +253,7 @@ unsigned char MH_EV(char board[ROW][COL]){
     char goalboard[ROW*COL]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
     bool goal=true;
     for(char i=0;i<ROW*COL;i++){
-    pos[(int)board[i/COL][i%COL]]=i;
+    pos[(int)board[((int)i)/COL][((int)i)%COL]]=i;
     if(board[((int)i)/COL][((int)i)%COL]!=goalboard[(int)i]){goal=false;}
     }
     //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
@@ -321,27 +323,31 @@ void bfs1(){
         for (int j = 0; j < 4; j++) {
         if (0 <= x + dx[j] && x + dx[j] < COL &&
             0 <= y + dy[j] && y + dy[j] < ROW) {
-            k2p next = tp;
-            int ny = y + dy[j];
-            int nx = x + dx[j];
-            int d = static_cast<int>(next.depth);
-            next.depth = (char)(d - 1);
-            char tileB = next.tile[(int)((ny * COL) + nx)];
-            swap(next.tile[(int)next.zpos], next.tile[(int)((ny * COL) + nx)]);
-            if (tileB != 16) {
-                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
-            } else {
-                next.tile_pos[0] = (ny * COL) + nx;
-            }
-            next.zpos = (ny * COL) + nx;
-            char* state_ptr = &k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]][(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]];
-            if (*state_ptr == static_cast<char>(-1)) {
+		k2p next = tp;
+		int ny = y + dy[j];
+		int nx = x + dx[j];
+		int d = static_cast<int>(next.depth);
+		next.depth = (char)(d - 1);
+		char tileB = next.tile[(int)((ny * COL) + nx)];
+		char tpm=next.tile[(int)next.zpos];
+		next.tile[(int)next.zpos]=next.tile[(int)((ny*COL)+nx)];
+		next.tile[(int)((ny*COL)+nx)]=tpm;
+		if (tileB != 16) {
+		tpm=next.tile_pos[0];
+		next.tile_pos[0]=next.tile_pos[(int)tileB];
+		next.tile_pos[(int)tileB]=tpm;
+		} else {
+                next.tile_pos[0] = (char)((ny * COL) + nx);
+		}
+		next.zpos = (char)((ny * COL) + nx);
+		char* state_ptr = &k5p[0][(int)next.zpos][(int)next.tile_pos[1]][(int)next.tile_pos[2]][(int)next.tile_pos[5]][(int)next.tile_pos[9]][(int)next.tile_pos[13]];
+		if (*state_ptr == static_cast<char>(-1)) {
                 *state_ptr = -next.depth;   
                 pq.push(next);
-            }
-        }
+		}
+	}
+	}
     }
-}
 }
 
 void bfs2(){
@@ -383,24 +389,28 @@ void bfs2(){
         for (int j = 0; j < 4; j++) {
         if (0 <= x + dx[j] && x + dx[j] < COL &&
             0 <= y + dy[j] && y + dy[j] < ROW) {
-            k2p next = tp;
-            int ny = y + dy[j];
-            int nx = x + dx[j];
-            int d = static_cast<int>(next.depth);
-            next.depth = (char)(d - 1);
-            char tileB = next.tile[(int)((ny * COL) + nx)];
-            swap(next.tile[(int)next.zpos], next.tile[(int)((ny * COL) + nx)]);
-            if (tileB != 16) {
-                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
-            } else {
-                next.tile_pos[0] = (ny * COL) + nx;
-            }
-            next.zpos = (ny * COL) + nx;
-            char* state_ptr = &k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]][(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]];
-            if (*state_ptr == static_cast<char>(-1)) {
+            	k2p next = tp;
+		int ny = y + dy[j];
+		int nx = x + dx[j];
+		int d = static_cast<int>(next.depth);
+		next.depth = (char)(d - 1);
+		char tileB = next.tile[(int)((ny * COL) + nx)];
+		char tpm=next.tile[(int)next.zpos];
+		next.tile[(int)next.zpos]=next.tile[(int)((ny*COL)+nx)];
+		next.tile[(int)((ny*COL)+nx)]=tpm;
+		if (tileB != 16) {
+		tpm=next.tile_pos[0];
+		next.tile_pos[0]=next.tile_pos[(int)tileB];
+		next.tile_pos[(int)tileB]=tpm;
+		} else {
+                next.tile_pos[0] = (char)((ny * COL) + nx);
+		}
+		next.zpos = (char)((ny * COL) + nx);
+		char* state_ptr = &k5p[1][(int)next.zpos][(int)next.tile_pos[3]][(int)next.tile_pos[4]][(int)next.tile_pos[6]][(int)next.tile_pos[7]][(int)next.tile_pos[8]];
+		if (*state_ptr == static_cast<char>(-1)) {
                 *state_ptr = -next.depth;   
                 pq.push(next);
-            }
+		}
         }
     }
 }
@@ -445,24 +455,28 @@ void bfs3(){
         for (int j = 0; j < 4; j++) {
         if (0 <= x + dx[j] && x + dx[j] < COL &&
             0 <= y + dy[j] && y + dy[j] < ROW) {
-            k2p next = tp;
-            int ny = y + dy[j];
-            int nx = x + dx[j];
-            int d = static_cast<int>(next.depth);
-            next.depth = (char)(d - 1);
-            char tileB = next.tile[(int)((ny * COL) + nx)];
-            swap(next.tile[(int)next.zpos], next.tile[(int)((ny * COL) + nx)]);
-            if (tileB != 16) {
-                swap(next.tile_pos[0], next.tile_pos[(int)tileB]);
-            } else {
-                next.tile_pos[0] = (ny * COL) + nx;
-            }
-            next.zpos = (ny * COL) + nx;
-            char* state_ptr = &k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]][(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]];
-            if (*state_ptr == static_cast<char>(-1)) {
+            	k2p next = tp;
+		int ny = y + dy[j];
+		int nx = x + dx[j];
+		int d = static_cast<int>(next.depth);
+		next.depth = (char)(d - 1);
+		char tileB = next.tile[(int)((ny * COL) + nx)];
+		char tpm=next.tile[(int)next.zpos];
+		next.tile[(int)next.zpos]=next.tile[(int)((ny*COL)+nx)];
+		next.tile[(int)((ny*COL)+nx)]=tpm;
+		if (tileB != 16) {
+		tpm=next.tile_pos[0];
+		next.tile_pos[0]=next.tile_pos[(int)tileB];
+		next.tile_pos[(int)tileB]=tpm;
+		} else {
+                next.tile_pos[0] = (char)((ny * COL) + nx);
+		}
+		next.zpos = (char)((ny * COL) + nx);
+		char* state_ptr = &k5p[2][(int)next.zpos][(int)next.tile_pos[10]][(int)next.tile_pos[11]][(int)next.tile_pos[12]][(int)next.tile_pos[14]][(int)next.tile_pos[15]];
+		if (*state_ptr == static_cast<char>(-1)) {
                 *state_ptr = -next.depth;   
                 pq.push(next);
-            }
+		}
         }
     }
 }
@@ -473,8 +487,8 @@ string ans="";
 char pos[ROW * COL] = {0};
 char number[ROW * COL] = {0};
 for (char i = 0; i < ROW * COL; i++) {
-pos[(int)board[i / COL][i % COL]] = i;
-number[(int)i]=board[i/COL][i%COL];
+pos[(int)board[((int)i)/ COL][((int)i) % COL]] = i;
+number[(int)i]=board[((int)i)/COL][((int)i)%COL];
 }
 char zero_pos=pos[0];
 for (char i = 0; i <= TRN / 21; i++) {
@@ -497,14 +511,16 @@ int zero_col = ((int)zero_pos) % COL;
 int move_row = dir / COL;
 int move_col = dir % COL;
 
-ans+=to_string((int)board[move_row][move_col])+",";    
-            
-swap(board[zero_row][zero_col], board[move_row][move_col]);
+ans+=to_string((int)board[move_row][move_col])+",";
+
+char tmp=board[zero_row][zero_col];
+board[zero_row][zero_col]=board[move_row][move_col];
+board[move_row][move_col]=tmp;
 
 pos[0] = (char)dir;
 pos[(int)number[dir]] = zero_pos;
 
-char tmp=number[dir];
+tmp=number[dir];
 number[dir]=number[(int)zero_pos];
 number[(int)zero_pos]=tmp;
 
@@ -554,7 +570,9 @@ int nx=xxx + dx[j];
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
-swap(board2[ny][nx],board2[yyy][xxx]);
+char abb=board2[yyy][xxx];
+board2[yyy][xxx]=board2[ny][nx];
+board2[ny][nx]=abb;
 cand.score=MH_EV(board2);    
 cand.prev=j;
 fff[(4 * k) + j] = cand;
@@ -630,7 +648,9 @@ int nx=xxx + dx[j];
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
 cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
-swap(board2[ny][nx],board2[yyy][xxx]);
+char abb=board2[yyy][xxx];
+board2[yyy][xxx]=board2[ny][nx];
+board2[ny][nx]=abb;
 int lim=LIM;
 if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim;}
 cand.score=(uc)BEAM_SEARCH(board2,lim-1);
