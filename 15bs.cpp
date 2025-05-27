@@ -15,7 +15,7 @@ path=66
 //#pragma warning(disable:4710)
 //#pragma warning(disable:4711)
 //#pragma warning(disable:4820)
-#pragma GCC optimize("unroll-loops")
+//#pragma GCC optimize("unroll-loops")
 #include <vector>
 #include <cfloat>
 #include <cstdio>
