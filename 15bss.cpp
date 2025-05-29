@@ -214,9 +214,10 @@ char zero_pos=pos[0];
 for (char i = 0; i <= TRN / 32; i++) {
 if(lim==0){break;}	
 for (int j = 0; j < 32; j++) {
-int m = (int)(3ll & (movei[(int)i] >> (2 * j)));
 lim--;
 if(lim==0){break;}
+
+int m = (int)(3ll & (movei[(int)i] >> (2 * j)));
 
 int dir=-1;
 
