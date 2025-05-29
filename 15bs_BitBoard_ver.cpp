@@ -48,7 +48,7 @@ using namespace std;
 #define ROW 4
 #define COL 4
 #define TRN 200
-#define BW 50000
+#define BW 10000
 #define BW2 1
 
 typedef unsigned long long ll;
