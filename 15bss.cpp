@@ -178,7 +178,7 @@ typedef unsigned char uc;
 struct node {
 uc score;
 ll hash;
-ll ans[(TRN/21)+1];
+ll ans[(TRN/32)+1];
 char prev;
 }fff[4*BW],ggg[4*BW2];
 
@@ -203,7 +203,7 @@ int shot=0;
 ll zoblish_field[ROW][COL][ROW*COL];
 char k5p[3][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL];
 
-char operation(char board[ROW][COL], ll movei[(TRN/21)+1]) {   
+char operation(char board[ROW][COL], ll movei[(TRN/32)+1],int lim) {   
 char pos[ROW * COL] = {0};
 char number[ROW * COL] = {0};
 for (char i = 0; i < ROW * COL; i++) {
@@ -211,20 +211,19 @@ pos[(int)board[((int)i) / COL][((int)i) % COL]] = i;
 number[(int)i]=board[((int)i)/COL][((int)i)%COL];
 }
 char zero_pos=pos[0];
-for (char i = 0; i <= TRN / 21; i++) {    
-if (movei[(int)i] == 0ll) {break;}
-for (int j = 0; j < 21; j++) {
-int m = (int)(7ll & (movei[(int)i] >> (3 * j)));   
-if (m == 0) {
-break;
-}
+for (char i = 0; i <= TRN / 32; i++) {
+if(lim==0){break;}	
+for (int j = 0; j < 32; j++) {
+int m = (int)(3ll & (movei[(int)i] >> (2 * j)));
+lim--;
+if(lim==0){break;}
 
 int dir=-1;
 
-if(m==1){dir=(int)zero_pos-1;}
-else if(m==2){dir=(int)zero_pos-COL;}
-else if(m==3){dir=(int)zero_pos+COL;}
-else if(m==4){dir=(int)zero_pos+1;}
+if(m==0){dir=(int)zero_pos-1;}
+else if(m==1){dir=(int)zero_pos-COL;}
+else if(m==2){dir=(int)zero_pos+COL;}
+else if(m==3){dir=(int)zero_pos+1;}
 
 int zero_row = ((int)zero_pos) / COL;
 int zero_col = ((int)zero_pos) % COL;
@@ -482,7 +481,7 @@ void bfs3(){
 }
 }
 
-string getans(char board[ROW][COL],ll movei[(TRN/21)+1]){
+string getans(char board[ROW][COL],ll movei[(TRN/32)+1],int lim){
 string ans="";
 char pos[ROW * COL] = {0};
 char number[ROW * COL] = {0};
@@ -491,20 +490,20 @@ pos[(int)board[((int)i)/ COL][((int)i) % COL]] = i;
 number[(int)i]=board[((int)i)/COL][((int)i)%COL];
 }
 char zero_pos=pos[0];
-for (char i = 0; i <= TRN / 21; i++) {
-if (movei[(int)i] == 0ll) {break;}
-for (int j = 0; j < 21; j++) {
-int m = (int)(7ll & (movei[(int)i] >> (3 * j)));
-if (m == 0) {
-break;
-}
+for (char i = 0; i <= TRN / 32; i++) {
+if (lim==0) {break;}
+for (int j = 0; j < 32; j++) {
+lim--;
+if(lim==0){break;}
+	
+int m = (int)(3ll & (movei[(int)i] >> (2 * j)));
 
 int dir=-1;
 
-if(m==1){dir=(int)zero_pos-1;}
-else if(m==2){dir=(int)zero_pos-COL;}
-else if(m==3){dir=(int)zero_pos+COL;}
-else if(m==4){dir=(int)zero_pos+1;}
+if(m==0){dir=(int)zero_pos-1;}
+else if(m==1){dir=(int)zero_pos-COL;}
+else if(m==2){dir=(int)zero_pos+COL;}
+else if(m==3){dir=(int)zero_pos+1;}
 
 int zero_row = ((int)zero_pos) / COL;
 int zero_col = ((int)zero_pos) % COL;
@@ -539,7 +538,7 @@ shot++;
 vector<node>dque;
 node n0;
 n0.hash=calc_hash(board);
-for(int i=0;i<=(TRN/21);i++){
+for(int i=0;i<=(TRN/32);i++){
 n0.ans[i]=0ll;
 }
 n0.prev=-1;    
@@ -556,7 +555,7 @@ for (int k = 0; k < ks; k++) {
 node temp = dque[k];
 char temp_board[ROW][COL];
 memcpy(temp_board, board, sizeof(temp_board));
-char zero_pos=operation(temp_board, temp.ans);
+char zero_pos=operation(temp_board, temp.ans,i+1);
 for (int j = 0; j < 4; j++) {
 node cand = temp;
 int xxx=((int)zero_pos)%COL;
@@ -569,7 +568,7 @@ int ny=yyy + dy[j];
 int nx=xxx + dx[j];
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
-cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
+cand.ans[i/32] |= (((ll)(j))<<((2*i)%64));
 char abb=board2[yyy][xxx];
 board2[yyy][xxx]=board2[ny][nx];
 board2[ny][nx]=abb;
@@ -618,7 +617,7 @@ vector<int>pro_league;
 vector<node>dque;
 node n0;
 n0.hash=calc_hash(board);
-for(int i=0;i<=(TRN/21);i++){
+for(int i=0;i<=(TRN/32);i++){
 n0.ans[i]=0ll;
 }
 n0.prev=-1;    
@@ -634,7 +633,7 @@ for (int k = 0; k < ks; k++) {
 node temp = dque[k];
 char temp_board[ROW][COL];
 memcpy(temp_board, board, sizeof(temp_board));
-char zero_pos=operation(temp_board, temp.ans);
+char zero_pos=operation(temp_board, temp.ans,i+1);
 for (int j = 0; j < 4; j++) {
 node cand = temp;
 int xxx=((int)zero_pos)%COL;
@@ -647,7 +646,7 @@ int ny=yyy + dy[j];
 int nx=xxx + dx[j];
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[yyy][xxx]])^(zoblish_field[ny][nx][(int)board2[ny][nx]]);
 cand.hash^=(zoblish_field[yyy][xxx][(int)board2[ny][nx]])^(zoblish_field[ny][nx][(int)board2[yyy][xxx]]);
-cand.ans[i/21] |= (((ll)(j+1))<<((3*i)%63));
+cand.ans[i/32] |= (((ll)(j))<<((2*i)%64));
 char abb=board2[yyy][xxx];
 board2[yyy][xxx]=board2[ny][nx];
 board2[ny][nx]=abb;
@@ -655,7 +654,7 @@ int lim=LIM;
 if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim;}
 cand.score=(uc)BEAM_SEARCH(board2,lim-1);
 if(MH_EV(board2)==0){
-    bestans=getans(board,cand.ans);
+    bestans=getans(board,cand.ans,i+2);
     return i+1;
 }
 cand.prev=j;
