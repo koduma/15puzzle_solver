@@ -704,7 +704,9 @@ if(bestans[i]==','){
 }
 ddd+=bestans[i];
 }
+if((int)ddd.size()>0){
 ck.push_back(stoi(ddd));
+}
 
 if(!judge(init_board,ck)){
 return 0;    
