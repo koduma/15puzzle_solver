@@ -565,11 +565,46 @@ push_node++;
 return 200;
 }
 
+bool judge(char board[ROW][COL],vector<int>ck){
+    
+    char goalboard[ROW][COL];
+
+    for(int i=1;i<=ROW*COL;i++){
+        goalboard[(i-1)/COL][(i-1)%COL]=(char)(i%(ROW*COL));
+    }
+
+    int zero_pos;
+
+    for(int i=0;i<ROW*COL;i++){
+        if(board[i/COL][i%COL]==0){zero_pos=i;break;}
+    }
+
+    for(int i=0;i<(int)ck.size();i++){
+        int pos=ck[i];
+        for(int j=0;j<ROW*COL;j++){
+            if(board[j/COL][j%COL]==pos){
+                if((j==zero_pos-1)||(j==zero_pos+1)||(j==zero_pos+COL)||(j==zero_pos-COL));
+                else{printf("move_error!\n");return false;}
+                swap(board[j/COL][j%COL],board[zero_pos/COL][zero_pos%COL]);
+                zero_pos=j;
+                break;
+            }
+        }
+    }
+
+    for(int i=0;i<ROW*COL;i++){
+        if(board[i/COL][i%COL]!=goalboard[i/COL][i%COL]){printf("board_error!\n");return false;}
+    }
+    printf("state:AC\n");
+    return true;
+}
+
 
 int main() {
     
 char board[ROW][COL];
 string a[ROW][COL];
+char init_board[ROW][COL];
 
 for(int i=0; i<ROW; i++){
 for(int j=0; j<COL; j++) {
@@ -580,6 +615,8 @@ else{board[i][j]=stoi(a[i][j]);}
 }
 
 auto start = chrono::high_resolution_clock::now();
+
+memcpy(init_board,board,sizeof(board));    
 
 int i1, i2, i3;
 for(i1=0;i1<ROW;++i1){
@@ -605,17 +642,40 @@ for(int i=0;i<3;i++){
 bfs(key[i][0],key[i][1],key[i][2],key[i][3],key[i][4],i);
 }
 
-printf("path=%d\n",BEAM_SEARCH2(board));
+printf("path_length:%d\n",BEAM_SEARCH2(board));
 
 
 //printf("path=%d\n",BEAM_SEARCH(board,TRN));
 //BEAM_SEARCH2(board);
-cout<<bestans<<endl;
 
 auto end = chrono::high_resolution_clock::now();
 auto duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
-cout << "time: " << duration/1000.0 << "s" << endl;
+cout << "calc_time: " << duration/1000.0 << "s" << endl;
+
+vector<int>ck;
+
+if (!bestans.empty()) {
+bestans.pop_back();
+}
+
+string ddd="";
+
+for(int i=0;i<(int)bestans.size();i++){
+if(bestans[i]==','){
+    ck.push_back(stoi(ddd));
+    ddd="";
+    continue;
+}
+ddd+=bestans[i];
+}
+ck.push_back(stoi(ddd));
+
+if(!judge(init_board,ck)){
+return 0;    
+}
+
+cout<<"route:{"<<bestans<<"}"<<endl; 
 
 
 
