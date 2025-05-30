@@ -546,6 +546,10 @@ if(ggg[j].score<200){
 vv.push_back(make_pair((int)ggg[j].score,j));
 }
 }
+if((int)vv.size()==0){
+cout<<"impossible"<<endl;
+exit(0);
+}	
 sort(vv.begin(),vv.end());
 printf("depth=%d/%d,score=%d\n",i+1,TRN,vv[0].first);    
 int push_node=0;
