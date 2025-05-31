@@ -618,7 +618,9 @@ bool judge(char board[ROW][COL],vector<int>ck){
             if(board[j/COL][j%COL]==pos){
                 if((j==zero_pos-1)||(j==zero_pos+1)||(j==zero_pos+COL)||(j==zero_pos-COL));
                 else{printf("move_error!\n");return false;}
-                swap(board[j/COL][j%COL],board[zero_pos/COL][zero_pos%COL]);
+		char tmp=board[j/COL][j%COL];
+		board[j/COL][j%COL]=board[zero_pos/COL][zero_pos%COL];
+		board[zero_pos/COL][zero_pos%COL]=tmp;
                 zero_pos=j;
                 break;
             }
