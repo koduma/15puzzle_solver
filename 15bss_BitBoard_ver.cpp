@@ -1,3 +1,4 @@
+
 //Linux:g++ -O2 -std=c++11 -fopenmp -lpthread 15bss_BitBoard_ver.cpp loguru.cpp -o 15bss_BitBoard_ver -mcmodel=large -ldl
 //Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -lpthread 15bss_BitBoard_ver.cpp loguru.cpp -o 15bss_BitBoard_ver -mcmodel=large
 
@@ -183,18 +184,21 @@ char prev;
 }fff[4*BW],ggg[4*BW2];
 
 struct k2p {
-    char tile[16];
-    char tile_pos[16];
+    long long tile;      // 盤面
+    long long tile_pos;  // 各番号の位置
     char depth;
     char zpos;
-
-    k2p(const char* s, const char* s2,char d,char zp) {
-    memcpy(tile, s, sizeof(tile));
-    memcpy(tile_pos, s2, sizeof(tile_pos));
-    depth = d;
-    zpos = zp;
-    }
+    k2p(long long t, long long tp, char d, char zp)
+      : tile(t), tile_pos(tp), depth(d), zpos(zp) {}
 };
+
+inline char get_tile(long long tile, int i) {
+    return (tile >> (i * 4)) & 0xF;
+}
+inline void set_tile(long long& tile, int i, char val) {
+    tile &= ~(0xFLL << (i * 4));
+    tile |= (static_cast<long long>(val & 0xF) << (i * 4));
+}
 
 void exchange_ll(int posA, int posB, ll* field) {
     int shiftA = posA * 4;
@@ -292,68 +296,79 @@ return hash;
 }
 
 void bfs(int key1,int key2,int key3,int key4,int key5,int pattern){
-
-    queue<k2p>pq;
-    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
-    //char tile[16];
-    //char tile_pos[16];    
-    //char depth;
-    //char zpos;
-    char tile[16];
-    char tile_pos[16];
-    for(char i=0;i<ROW*COL;i++){
-    tile[(int)i]=16;
-    tile_pos[(int)i]=-1;
+    queue<k2p> pq;
+    long long tile = 0, tile_pos = 0;
+    int same1,same2;
+    if (key1==1){
+        same1=8;
+        same2=6;
     }
-    tile[key1-1]=(char)key1;
-    tile[key2-1]=(char)key2;
-    tile[key3-1]=(char)key3;
-    tile[key4-1]=(char)key4;
-    tile[key5-1]=(char)key5;
-    tile[15]=0;
-    tile_pos[key1]=(char)(key1-1);
-    tile_pos[key2]=(char)(key2-1);
-    tile_pos[key3]=(char)(key3-1);
-    tile_pos[key4]=(char)(key4-1);
-    tile_pos[key5]=(char)(key5-1);
-    tile_pos[0]=15;
-    char zps=15;
-    k2p kpt = {tile,tile_pos,0,zps};
+    else if(key1==3){
+        same1=9;
+        same2=9;
+    }
+    else if(key1==10){
+        same1=13;
+        same2=8;
+    }
+    for (int i = 0; i < ROW * COL; ++i) {
+        set_tile(tile, i, same1);
+        set_tile(tile_pos, i, same2);
+    }
+    set_tile(tile, key1 - 1, key1);
+    set_tile(tile, key2 - 1, key2);
+    set_tile(tile, key3 - 1, key3);
+    set_tile(tile, key4 - 1, key4);
+    set_tile(tile, key5 - 1, key5);
+    set_tile(tile, 15, 0);
+
+    set_tile(tile_pos, key1, key1 - 1);
+    set_tile(tile_pos, key2, key2 - 1);
+    set_tile(tile_pos, key3, key3 - 1);
+    set_tile(tile_pos, key4, key4 - 1);
+    set_tile(tile_pos, key5, key5 - 1);
+    set_tile(tile_pos, 0, 15);
+
+    char zps = 15;
+    k2p kpt(tile, tile_pos, 0, zps);
     pq.push(kpt);
-    int dx[4] = { -1, 0,0,1 };
-    int dy[4] = { 0,-1,1,0 };
-    k5p[pattern][15][key1-1][key2-1][key3-1][key4-1][key5-1]=0;
-    while(!pq.empty()){
-        k2p tp = pq.front();pq.pop();
-        int y=((int)tp.zpos)/COL;
-        int x=((int)tp.zpos)%COL;
+
+    int dx[4] = { -1, 0, 0, 1 };
+    int dy[4] = { 0, -1, 1, 0 };
+    memset(k5p[pattern], -1, sizeof(k5p[pattern]));
+    k5p[pattern][15][key1 - 1][key2 - 1][key3 - 1][key4 - 1][key5 - 1] = 0;
+
+    while (!pq.empty()) {
+        k2p tp = pq.front(); pq.pop();
+        int y = tp.zpos / COL;
+        int x = tp.zpos % COL;
         for (int j = 0; j < 4; j++) {
-        if (0 <= x + dx[j] && x + dx[j] < COL &&
-            0 <= y + dy[j] && y + dy[j] < ROW) {
-		k2p next = tp;
-		int ny = y + dy[j];
-		int nx = x + dx[j];
-		int d = static_cast<int>(next.depth);
-		next.depth = (char)(d - 1);
-		char tileB = next.tile[(int)((ny * COL) + nx)];
-		char tpm=next.tile[(int)next.zpos];
-		next.tile[(int)next.zpos]=next.tile[(int)((ny*COL)+nx)];
-		next.tile[(int)((ny*COL)+nx)]=tpm;
-		if (tileB != 16) {
-		tpm=next.tile_pos[0];
-		next.tile_pos[0]=next.tile_pos[(int)tileB];
-		next.tile_pos[(int)tileB]=tpm;
-		} else {
-                next.tile_pos[0] = (char)((ny * COL) + nx);
-		}
-		next.zpos = (char)((ny * COL) + nx);
-		char* state_ptr = &k5p[pattern][(int)next.zpos][(int)next.tile_pos[key1]][(int)next.tile_pos[key2]][(int)next.tile_pos[key3]][(int)next.tile_pos[key4]][(int)next.tile_pos[key5]];
-		if (*state_ptr == static_cast<char>(-1)) {
-                *state_ptr = -next.depth;   
-                pq.push(next);
-		}
-	}
-	}
+            int nx = x + dx[j];
+            int ny = y + dy[j];
+            if (0 <= nx && nx < COL && 0 <= ny && ny < ROW) {
+                k2p next = tp;
+                int d = static_cast<int>(next.depth);
+                next.depth = (char)(d - 1);
+                int nzpos = ny * COL + nx;
+                char tileB = get_tile(next.tile, nzpos);
+                char tpm = get_tile(next.tile, next.zpos);
+                set_tile(next.tile, next.zpos, get_tile(next.tile, nzpos));
+                set_tile(next.tile, nzpos, tpm);
+                if (tileB != same1) {
+                    char tpm2 = get_tile(next.tile_pos, 0);
+                    set_tile(next.tile_pos, 0, get_tile(next.tile_pos, tileB));
+                    set_tile(next.tile_pos, tileB, tpm2);
+                } else {
+                    set_tile(next.tile_pos, 0, nzpos);
+                }
+                next.zpos = nzpos;
+                char* state_ptr = &k5p[pattern][(int)next.zpos][(int)get_tile(next.tile_pos, key1)][(int)get_tile(next.tile_pos, key2)][(int)get_tile(next.tile_pos, key3)][(int)get_tile(next.tile_pos, key4)][(int)get_tile(next.tile_pos, key5)];
+                if (*state_ptr == (char)-1) {
+                    *state_ptr = -next.depth;
+                    pq.push(next);
+                }
+            }
+        }
     }
 }
 
