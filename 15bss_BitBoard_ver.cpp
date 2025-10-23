@@ -1,4 +1,5 @@
 
+
 //Linux:g++ -O2 -std=c++11 -fopenmp -lpthread 15bss_BitBoard_ver.cpp loguru.cpp -o 15bss_BitBoard_ver -mcmodel=large -ldl
 //Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -lpthread 15bss_BitBoard_ver.cpp loguru.cpp -o 15bss_BitBoard_ver -mcmodel=large
 
@@ -181,7 +182,15 @@ uc score;
 ll hash;
 ll ans[(TRN/32)+1];
 char prev;
-}fff[4*BW],ggg[4*BW2];
+}fff[4*BW];
+
+struct node2 {
+uc score;
+ll hash;
+ll ans[(TRN/32)+1];
+char prev;
+uc second_score;
+}ggg[4*BW2];
 
 struct k2p {
     long long tile;      // 盤面
@@ -513,8 +522,8 @@ int BEAM_SEARCH2(ll goalboard,ll bboard,char board[ROW][COL],char pos[ROW*COL],i
 if(MH_EV(goalboard,bboard,pos)==0){return 0;}	
 int LIM=TURN;
 vector<int>pro_league;
-vector<node>dque;
-node n0;
+vector<node2>dque;
+node2 n0;
 n0.hash=calc_hash(board);
 for(int i=0;i<=(TRN/32);i++){
 n0.ans[i]=0ll;
@@ -529,14 +538,14 @@ int ks = (int)dque.size();
 pro_league.clear();	
 //#pragma omp parallel for
 for (int k = 0; k < ks; k++) {
-node temp = dque[k];
+node2 temp = dque[k];
 char temp_board[ROW][COL];
 char temp_pos[ROW*COL];    
 ll tmp_bboard=bboard;
 memcpy(temp_board, board, sizeof(temp_board));   
 char zero_pos=operation(temp_board, temp.ans,temp_pos,&tmp_bboard,i+1);  
 for (int j = 0; j < 4; j++) {
-node cand = temp;
+node2 cand = temp;
 int xxx=((int)zero_pos)%COL;
 int yyy=((int)zero_pos)/COL;
 if (0 <= xxx + dx[j] && xxx + dx[j] < COL &&
@@ -565,7 +574,8 @@ board3[ny][nx]=abd;
 int lim=LIM;
 if((int)pro_league.size()>=BW2){lim=pro_league[BW2-1];LIM=lim;}
 cand.score=(uc)BEAM_SEARCH(goalboard,board2,board3,pos2,lim-1);
-if(MH_EV(goalboard,board2,pos2)==0){
+cand.second_score=MH_EV(goalboard,board2,pos2);   
+if(cand.second_score==0){
     bestans=getans(board,cand.ans,i+2);
     return i+1;
 }    
@@ -584,10 +594,10 @@ ggg[(4 * k) + j] = cand;
 }
 }
 dque.clear();
-vector<pair<int,int> >vv;
+vector<tuple<int,int,int> >vv;
 for (int j = 0; j < 4 * ks; j++) {
 if(ggg[j].score<200){
-vv.push_back(make_pair((int)ggg[j].score,j));
+vv.push_back(make_tuple((int)ggg[j].score,(int)ggg[j].second_score,j));
 }
 }
 if((int)vv.size()==0){
@@ -595,12 +605,12 @@ if((int)vv.size()==0){
     exit(0);
 }	
 sort(vv.begin(),vv.end());
-printf("depth=%d/%d,score=%d\n",i+1,TURN,vv[0].first);    
+printf("depth=%d/%d,score=%d\n",i+1,TURN,get<0>(vv[0]));    
 int push_node=0;
 for (int j = 0; push_node < BW2 ;j++) {  
 if(j>=(int)vv.size()){break;}
-int p=vv[j].second;
-node n1=ggg[p];
+int p=get<2>(vv[j]);
+node2 n1=ggg[p];
 if (i < TURN - 1) {
 if(!visited[n1.hash]){
 visited[n1.hash]=true;
