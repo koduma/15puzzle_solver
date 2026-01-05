@@ -227,7 +227,7 @@ string bestans;
 int shot=0;
 
 ll zoblish_field[ROW][COL][ROW*COL];
-char k5p[3][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL][ROW*COL];
+char k5p[51000000];
 
 char operation(char board[ROW][COL], ll movei[(TRN/32)+1],char pos[ROW * COL],ll* bboard,int lim) {   
 char number[ROW * COL] = {0};
@@ -275,13 +275,15 @@ zero_pos = (char)dir;
 return zero_pos;
 }
 
-unsigned char MH_EV(ll goalboard,ll bboard,char pos[ROW*COL]){
-    if(goalboard==bboard){return 0;}
-    uc ev=0;
-    //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
-    ev+=k5p[0][(int)pos[0]][(int)pos[1]][(int)pos[2]][(int)pos[5]][(int)pos[9]][(int)pos[13]];
-    ev+=k5p[1][(int)pos[0]][(int)pos[3]][(int)pos[4]][(int)pos[6]][(int)pos[7]][(int)pos[8]];
-    ev+=k5p[2][(int)pos[0]][(int)pos[10]][(int)pos[11]][(int)pos[12]][(int)pos[14]][(int)pos[15]];    
+unsigned char MH_EV(ll goalboard, ll bboard, char pos[ROW*COL]) {
+    if (goalboard == bboard) { return 0; }
+    unsigned char ev = 0;
+    int idx0 = ((int)pos[0] << 20) | ((int)pos[1] << 16) | ((int)pos[2] << 12) | ((int)pos[5] << 8) | ((int)pos[9] << 4) | (int)pos[13];
+    ev += k5p[idx0];
+    int idx1 = (1 << 24) | ((int)pos[0] << 20) | ((int)pos[3] << 16) | ((int)pos[4] << 12) | ((int)pos[6] << 8) | ((int)pos[7] << 4) | (int)pos[8];
+    ev += k5p[idx1];
+    int idx2 = (2 << 24) | ((int)pos[0] << 20) | ((int)pos[10] << 16) | ((int)pos[11] << 12) | ((int)pos[12] << 8) | ((int)pos[14] << 4) | (int)pos[15];
+    ev += k5p[idx2];
     return ev;
 }
 
@@ -304,22 +306,22 @@ hash ^= zoblish_field[row][col][(int)num];
 return hash;
 }
 
-void bfs(int key1,int key2,int key3,int key4,int key5,int pattern){
+void bfs(int key1, int key2, int key3, int key4, int key5, int pattern) {
     queue<k2p> pq;
     long long tile = 0, tile_pos = 0;
-    int same1,same2;
-    if (key1==1){
-        same1=8;
-        same2=6;
+    int same1, same2;
+
+    if (key1 == 1) {
+        same1 = 8;
+        same2 = 6;
+    } else if (key1 == 3) {
+        same1 = 9;
+        same2 = 9;
+    } else if (key1 == 10) {
+        same1 = 13;
+        same2 = 8;
     }
-    else if(key1==3){
-        same1=9;
-        same2=9;
-    }
-    else if(key1==10){
-        same1=13;
-        same2=8;
-    }
+
     for (int i = 0; i < ROW * COL; ++i) {
         set_tile(tile, i, same1);
         set_tile(tile_pos, i, same2);
@@ -344,8 +346,11 @@ void bfs(int key1,int key2,int key3,int key4,int key5,int pattern){
 
     int dx[4] = { -1, 0, 0, 1 };
     int dy[4] = { 0, -1, 1, 0 };
-    memset(k5p[pattern], -1, sizeof(k5p[pattern]));
-    k5p[pattern][15][key1 - 1][key2 - 1][key3 - 1][key4 - 1][key5 - 1] = 0;
+
+    int pattern_offset = pattern << 24; 
+    memset(k5p + pattern_offset, -1, 16777216);
+    int start_idx = pattern_offset | (15 << 20) | ((key1 - 1) << 16) | ((key2 - 1) << 12) | ((key3 - 1) << 8) | ((key4 - 1) << 4) | (key5 - 1);
+    k5p[start_idx] = 0;
 
     while (!pq.empty()) {
         k2p tp = pq.front(); pq.pop();
@@ -371,9 +376,15 @@ void bfs(int key1,int key2,int key3,int key4,int key5,int pattern){
                     set_tile(next.tile_pos, 0, nzpos);
                 }
                 next.zpos = nzpos;
-                char* state_ptr = &k5p[pattern][(int)next.zpos][(int)get_tile(next.tile_pos, key1)][(int)get_tile(next.tile_pos, key2)][(int)get_tile(next.tile_pos, key3)][(int)get_tile(next.tile_pos, key4)][(int)get_tile(next.tile_pos, key5)];
-                if (*state_ptr == (char)-1) {
-                    *state_ptr = -next.depth;
+                int idx = pattern_offset | (next.zpos << 20) |
+                          (get_tile(next.tile_pos, key1) << 16) |
+                          (get_tile(next.tile_pos, key2) << 12) |
+                          (get_tile(next.tile_pos, key3) << 8) |
+                          (get_tile(next.tile_pos, key4) << 4) |
+                          get_tile(next.tile_pos, key5);
+                
+                if (k5p[idx] == (char)-1) {
+                    k5p[idx] = -next.depth;
                     pq.push(next);
                 }
             }
@@ -695,8 +706,6 @@ for(int i=1;i<=ROW*COL;i++){
 goalboard |= ((ll)(i % (ROW * COL))) << (4 * (i - 1));
 bboard |= ((ll)board[(i - 1) / COL][(i - 1) % COL]) << (4 * (i - 1));
 }
-
-memset(k5p, -1, sizeof(k5p));
 
 //{1,2,5,9,13},{3,4,6,7,8},{10,11,12,14,15}
 
