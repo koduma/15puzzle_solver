@@ -503,15 +503,19 @@ fff[(4 * k) + j] = cand;
 }   
 dque.clear();
 vector<pair<int,int> >vv;
+int hit=0;
 for (int j = 0; j < 4 * ks; j++) {
 if(fff[j].score==0){
     return i+1;
 }
 if(fff[j].score<200){
 vv.push_back(make_pair((int)fff[j].score,j));
+hit++;
 }
 }
+if(hit>BW){
 sort(vv.begin(),vv.end());
+}
 int push_node=0;
 for (int j = 0; push_node < BW ;j++) {  
 if(j>=(int)vv.size()){break;}
